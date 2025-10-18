@@ -1,12 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 function getGeminiClient() {
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    throw new Error('Missing GOOGLE_GENERATIVE_AI_API_KEY environment variable')
+  if (!process.env.Gemini_API_KEY) {
+    throw new Error('Missing Gemini_API_KEY environment variable')
   }
   
   const genAI = new GoogleGenerativeAI(
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY
+    process.env.Gemini_API_KEY
   )
   
   // Gemini 2.5 Pro 配置
