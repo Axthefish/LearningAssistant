@@ -168,7 +168,7 @@ export default function Test3DPage() {
   
   // 解析数据
   const universalFramework = parseUniversalFramework(mockUniversalMarkdown)
-  const personalizedFramework = parsePersonalizedFramework(mockPersonalizedMarkdown)
+  const personalizedFramework = parsePersonalizedFramework(mockPersonalizedMarkdown, universalFramework)
   
   // 转换为3D场景数据
   const universalSceneData = mapUniversalFrameworkTo3D(universalFramework)

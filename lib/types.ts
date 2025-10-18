@@ -62,13 +62,11 @@ export interface UserAnswer {
   timestamp: number
 }
 
-export interface PersonalizedFramework {
+export interface PersonalizedFramework extends UniversalFramework {
   personalInsights: PersonalInsight[]
   actionMap: ActionMapItem[]
   superpower: string
   firstStep: string
-  rawMarkdown: string
-  timestamp: number
 }
 
 export interface PersonalInsight {

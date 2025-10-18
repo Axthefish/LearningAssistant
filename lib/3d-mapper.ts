@@ -3,7 +3,7 @@
  * 将AI生成的框架数据转换为3D可视化所需的结构
  */
 
-import type { UniversalFramework, PersonalizedFramework } from './markdown-parser'
+import type { UniversalFramework, PersonalizedFramework } from './types'
 
 export interface Node3D {
   id: string
@@ -59,7 +59,7 @@ export function mapUniversalFrameworkTo3D(
     const basePos = modulePositions[moduleIndex % 4]
     const color = moduleColors[moduleIndex % 4]
     
-    module.key_actions.forEach((action, actionIndex) => {
+    module.keyActions.forEach((action, actionIndex) => {
       const nodeId = `${moduleIndex}-${actionIndex}`
       
       nodes.push({
@@ -91,26 +91,26 @@ export function mapUniversalFrameworkTo3D(
   
   // 创建跨模块连接（基于dynamics）
   if (framework.dynamics) {
-    const { synergy, tradeoff, dependency, feedback_loop } = framework.dynamics
+    const { synergy, tradeoff, dependency, feedbackLoop } = framework.dynamics
     
     // Synergy连接
     if (synergy) {
       const fromModule = framework.modules.findIndex(
-        (m) => m.name === synergy.modules_involved[0]
+        (m) => m.name === synergy.modulesInvolved[0]
       )
       const toModule = framework.modules.findIndex(
-        (m) => m.name === synergy.modules_involved[1]
+        (m) => m.name === synergy.modulesInvolved[1]
       )
       if (fromModule !== -1 && toModule !== -1) {
         // 连接中层节点
-        const fromLevel = Math.floor(framework.modules[fromModule].key_actions.length / 2)
-        const toLevel = Math.floor(framework.modules[toModule].key_actions.length / 2)
+        const fromLevel = Math.floor(framework.modules[fromModule].keyActions.length / 2)
+        const toLevel = Math.floor(framework.modules[toModule].keyActions.length / 2)
         connections.push({
           from: `${fromModule}-${fromLevel}`,
           to: `${toModule}-${toLevel}`,
           type: 'synergy',
           color: '#10b981',
-          label: synergy.effect_name,
+          label: synergy.effectName,
         })
       }
     }
@@ -118,20 +118,20 @@ export function mapUniversalFrameworkTo3D(
     // Trade-off连接
     if (tradeoff) {
       const fromModule = framework.modules.findIndex(
-        (m) => m.name === tradeoff.modules_involved[0]
+        (m) => m.name === tradeoff.modulesInvolved[0]
       )
       const toModule = framework.modules.findIndex(
-        (m) => m.name === tradeoff.modules_involved[1]
+        (m) => m.name === tradeoff.modulesInvolved[1]
       )
       if (fromModule !== -1 && toModule !== -1) {
-        const fromLevel = Math.floor(framework.modules[fromModule].key_actions.length / 2)
-        const toLevel = Math.floor(framework.modules[toModule].key_actions.length / 2)
+        const fromLevel = Math.floor(framework.modules[fromModule].keyActions.length / 2)
+        const toLevel = Math.floor(framework.modules[toModule].keyActions.length / 2)
         connections.push({
           from: `${fromModule}-${fromLevel}`,
           to: `${toModule}-${toLevel}`,
           type: 'tradeoff',
           color: '#f59e0b',
-          label: tradeoff.effect_name,
+          label: tradeoff.effectName,
         })
       }
     }
@@ -139,10 +139,10 @@ export function mapUniversalFrameworkTo3D(
     // Dependency连接
     if (dependency) {
       const fromModule = framework.modules.findIndex(
-        (m) => m.name === dependency.modules_involved[0]
+        (m) => m.name === dependency.modulesInvolved[0]
       )
       const toModule = framework.modules.findIndex(
-        (m) => m.name === dependency.modules_involved[1]
+        (m) => m.name === dependency.modulesInvolved[1]
       )
       if (fromModule !== -1 && toModule !== -1) {
         // 依赖通常连接底层
@@ -151,29 +151,29 @@ export function mapUniversalFrameworkTo3D(
           to: `${toModule}-0`,
           type: 'dependency',
           color: '#8b5cf6',
-          label: dependency.effect_name,
+          label: dependency.effectName,
         })
       }
     }
     
     // Feedback Loop连接
-    if (feedback_loop && feedback_loop.modules_involved.length >= 2) {
-      for (let i = 0; i < feedback_loop.modules_involved.length - 1; i++) {
+    if (feedbackLoop && feedbackLoop.modulesInvolved.length >= 2) {
+      for (let i = 0; i < feedbackLoop.modulesInvolved.length - 1; i++) {
         const fromModule = framework.modules.findIndex(
-          (m) => m.name === feedback_loop.modules_involved[i]
+          (m) => m.name === feedbackLoop.modulesInvolved[i]
         )
         const toModule = framework.modules.findIndex(
-          (m) => m.name === feedback_loop.modules_involved[i + 1]
+          (m) => m.name === feedbackLoop.modulesInvolved[i + 1]
         )
         if (fromModule !== -1 && toModule !== -1) {
-          const fromLevel = Math.floor(framework.modules[fromModule].key_actions.length / 2)
-          const toLevel = Math.floor(framework.modules[toModule].key_actions.length / 2)
+          const fromLevel = Math.floor(framework.modules[fromModule].keyActions.length / 2)
+          const toLevel = Math.floor(framework.modules[toModule].keyActions.length / 2)
           connections.push({
             from: `${fromModule}-${fromLevel}`,
             to: `${toModule}-${toLevel}`,
             type: 'feedback',
             color: '#ec4899',
-            label: i === 0 ? feedback_loop.effect_name : undefined,
+            label: i === 0 ? feedbackLoop.effectName : undefined,
           })
         }
       }
@@ -184,7 +184,7 @@ export function mapUniversalFrameworkTo3D(
     nodes,
     connections,
     metadata: {
-      systemName: framework.system_name || 'System',
+      systemName: framework.systemName || 'System',
       centerPosition: [0, 3, 0],
     },
   }
@@ -200,9 +200,9 @@ export function mapPersonalizedFrameworkTo3D(
   const baseData = mapUniversalFrameworkTo3D(framework)
   
   // 增强节点（添加状态标记）
-  if (framework.action_map && framework.action_map.length > 0) {
+  if (framework.actionMap && framework.actionMap.length > 0) {
     baseData.nodes = baseData.nodes.map(node => {
-      const actionInfo = framework.action_map.find(
+      const actionInfo = framework.actionMap.find(
         (a) => {
           // 尝试匹配action label
           const normalizedLabel = node.label.toLowerCase().trim()
@@ -219,7 +219,7 @@ export function mapPersonalizedFrameworkTo3D(
           // 根据状态改变颜色/大小
           color: getStatusColor(actionInfo.status, node.color),
           scale: actionInfo.status === 'opportunity' ? 1.3 : 1.0,
-          recommendations: actionInfo.next_moves,
+          recommendations: actionInfo.nextMoves,
         }
       }
       
