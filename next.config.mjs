@@ -5,13 +5,28 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.externals.push({
       'utf-8-validate': 'commonjs utf-8-validate',
       'bufferutil': 'commonjs bufferutil',
     })
+    
+    // Three.js 优化
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+      }
+    }
+    
     return config
   },
+  // 图片优化
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
+  // 压缩
+  compress: true,
 }
 
 export default nextConfig

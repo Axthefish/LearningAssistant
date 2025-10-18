@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { StoreInitializer } from "@/components/StoreInitializer"
+import { GlobalNav } from "@/components/GlobalNav"
+import { ThemeProvider } from "@/components/ThemeProvider"
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -16,9 +19,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" suppressHydrationWarning>
       <body className={inter.className}>
-        <StoreInitializer>{children}</StoreInitializer>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <StoreInitializer>
+            <GlobalNav />
+            <main className="pt-16">{children}</main>
+            <Toaster />
+          </StoreInitializer>
+        </ThemeProvider>
       </body>
     </html>
   )
