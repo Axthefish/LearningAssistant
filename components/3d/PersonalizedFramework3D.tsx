@@ -386,20 +386,23 @@ export function PersonalizedFramework3D({
     return () => {
       cancelAnimationFrame(animationFrameRef.current)
       window.removeEventListener('resize', handleResize)
-      containerRef.current?.removeEventListener('mousemove', onMouseMove)
-      containerRef.current?.removeEventListener('click', onClick)
-      containerRef.current?.removeEventListener('mousedown', onMouseDown)
+      const container = containerRef.current
+      container?.removeEventListener('mousemove', onMouseMove)
+      container?.removeEventListener('click', onClick)
+      container?.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mousemove', onMouseMoveCamera)
       window.removeEventListener('mouseup', onMouseUp)
       
       // 清理Three.js资源
-      nodeMapRef.current.forEach((mesh) => {
+      const nodes = nodeMapRef.current
+      nodes.forEach((mesh) => {
         mesh.geometry.dispose()
         if (mesh.material instanceof THREE.Material) {
           mesh.material.dispose()
         }
       })
-      particlesRef.current.forEach((particle) => {
+      const particles = particlesRef.current
+      particles.forEach((particle) => {
         particle.geometry.dispose()
         if (particle.material instanceof THREE.Material) {
           particle.material.dispose()
@@ -407,8 +410,8 @@ export function PersonalizedFramework3D({
       })
       
       renderer.dispose()
-      if (containerRef.current?.contains(renderer.domElement)) {
-        containerRef.current.removeChild(renderer.domElement)
+      if (container?.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement)
       }
     }
   }, [data, onNodeClick, autoRotate])
