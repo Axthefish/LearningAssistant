@@ -4,6 +4,7 @@ import "./globals.css"
 import { StoreInitializer } from "@/components/StoreInitializer"
 import { GlobalNav } from "@/components/GlobalNav"
 import { ThemeProvider } from "@/components/ThemeProvider"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { Toaster } from "@/components/ui/toaster"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
@@ -23,18 +24,20 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <StoreInitializer>
-            <GlobalNav />
-            <main className="pt-16">{children}</main>
-            <Toaster />
-          </StoreInitializer>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <StoreInitializer>
+              <GlobalNav />
+              <main className="pt-16">{children}</main>
+              <Toaster />
+            </StoreInitializer>
+          </ThemeProvider>
+        </ErrorBoundary>
         <Analytics />
         <SpeedInsights />
       </body>

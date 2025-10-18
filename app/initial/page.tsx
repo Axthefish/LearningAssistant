@@ -22,6 +22,8 @@ export default function InitialExtractionPage() {
   const [editedContent, setEditedContent] = useState('')
   const [isConfirmed, setIsConfirmed] = useState(false)
   
+  const missionStatement = useStore(state => state.session?.missionStatement)
+  
   const { content, isStreaming, sendMessage } = useChat({
     onFinish: (finalContent) => {
       setEditedContent(finalContent)
@@ -34,10 +36,18 @@ export default function InitialExtractionPage() {
       return
     }
     
-    // 调用AI生成Mission Statement
-    sendMessage('initial', {
-      USER_INPUT: userInput.content,
-    })
+    // 如果已有Mission Statement，直接使用，避免重复调用AI
+    if (missionStatement?.content && !missionStatement.confirmed) {
+      setEditedContent(missionStatement.content)
+      return
+    }
+    
+    // 只有在没有内容时才调用AI
+    if (!content && !isStreaming) {
+      sendMessage('initial', {
+        USER_INPUT: userInput.content,
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   

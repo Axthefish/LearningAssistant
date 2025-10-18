@@ -20,6 +20,7 @@ import type { Scene3DData, Node3D } from '@/lib/3d-mapper'
 export default function UniversalFrameworkPage() {
   const router = useRouter()
   const missionStatement = useMissionStatement()
+  const existingFramework = useStore(state => state.session?.universalFramework)
   const setUniversalFramework = useStore(state => state.setUniversalFramework)
   const confirmPersonalization = useStore(state => state.confirmPersonalization)
   
@@ -53,10 +54,21 @@ export default function UniversalFrameworkPage() {
       return
     }
     
-    // 调用AI生成通用框架
-    sendMessage('universal', {
-      FOKAL_POINT: missionStatement.content,
-    })
+    // 如果已有框架，直接使用，避免重复调用AI
+    if (existingFramework) {
+      setParsedFramework(existingFramework)
+      const sceneData = mapUniversalFrameworkTo3D(existingFramework)
+      setScene3DData(sceneData)
+      setShowConfirmation(true)
+      return
+    }
+    
+    // 只有在没有内容时才调用AI
+    if (!content && !isStreaming) {
+      sendMessage('universal', {
+        FOKAL_POINT: missionStatement.content,
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   

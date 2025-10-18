@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { PromptType } from '@/lib/prompts'
 
 interface UseChatOptions {
@@ -12,6 +12,13 @@ export function useChat(options: UseChatOptions = {}) {
   const [content, setContent] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  
+  // 使用 ref 存储 options 避免依赖变化导致重新创建
+  const optionsRef = useRef(options)
+  
+  useEffect(() => {
+    optionsRef.current = options
+  }, [options])
   
   const sendMessage = useCallback(
     async (promptType: PromptType, variables: Record<string, string>) => {
@@ -53,7 +60,7 @@ export function useChat(options: UseChatOptions = {}) {
               
               if (data === '[DONE]') {
                 setIsStreaming(false)
-                options.onFinish?.(accumulatedContent)
+                optionsRef.current.onFinish?.(accumulatedContent)
                 return
               }
               
@@ -71,15 +78,15 @@ export function useChat(options: UseChatOptions = {}) {
         }
         
         setIsStreaming(false)
-        options.onFinish?.(accumulatedContent)
+        optionsRef.current.onFinish?.(accumulatedContent)
       } catch (err) {
         const error = err instanceof Error ? err : new Error('Unknown error')
         setError(error)
         setIsStreaming(false)
-        options.onError?.(error)
+        optionsRef.current.onError?.(error)
       }
     },
-    [options]
+    [] // 移除 options 依赖
   )
   
   return {
