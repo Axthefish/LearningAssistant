@@ -5,6 +5,8 @@ import { StoreInitializer } from "@/components/StoreInitializer"
 import { GlobalNav } from "@/components/GlobalNav"
 import { ThemeProvider } from "@/components/ThemeProvider"
 import { Toaster } from "@/components/ui/toaster"
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -33,6 +35,8 @@ export default function RootLayout({
             <Toaster />
           </StoreInitializer>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

@@ -57,6 +57,7 @@ export default function UniversalFrameworkPage() {
     sendMessage('universal', {
       FOKAL_POINT: missionStatement.content,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   const handleConfirmPersonalization = async () => {

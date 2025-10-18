@@ -1,0 +1,17 @@
+node_modules
+.next
+.env.local
+*.log
+.DS_Store
+AGENT_*.md
+TESTING_*.md
+ISSUES_*.md
+POST_*.md
+DEPLOYMENT.md
+*.plan.md
+3D实践案例.md
+分析权重并向用户提问.md
+初始目的提取.md
+特殊化架构生成.md
+通用架构生成.md
+

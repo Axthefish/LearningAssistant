@@ -81,6 +81,7 @@ export default function PersonalizedFrameworkPage() {
       DIAGNOSTIC_POINTS_AND_QUESTIONS: '...', // TODO: 从store获取
       USER_ANSWERS: answersText,
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
   const handleExport = () => {
