@@ -34,6 +34,11 @@ export function UniversalFramework3D({
   useEffect(() => {
     if (!containerRef.current) return
     
+    // 保存refs用于cleanup
+    const container = containerRef.current
+    const nodeMap = nodeMapRef.current
+    const particles = particlesRef.current
+    
     // ============ Phase 1: 基础场景设置 ============
     const scene = new THREE.Scene()
     scene.background = new THREE.Color(0x0a0a0a)
@@ -355,7 +360,6 @@ export function UniversalFramework3D({
     return () => {
       cancelAnimationFrame(animationFrameRef.current)
       window.removeEventListener('resize', handleResize)
-      const container = containerRef.current
       container?.removeEventListener('mousemove', onMouseMove)
       container?.removeEventListener('click', onClick)
       container?.removeEventListener('mousedown', onMouseDown)
@@ -363,14 +367,12 @@ export function UniversalFramework3D({
       window.removeEventListener('mouseup', onMouseUp)
       
       // 清理Three.js资源
-      const nodes = nodeMapRef.current
-      nodes.forEach((mesh) => {
+      nodeMap.forEach((mesh) => {
         mesh.geometry.dispose()
         if (mesh.material instanceof THREE.Material) {
           mesh.material.dispose()
         }
       })
-      const particles = particlesRef.current
       particles.forEach((particle) => {
         particle.geometry.dispose()
         if (particle.material instanceof THREE.Material) {
