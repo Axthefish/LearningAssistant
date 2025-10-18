@@ -1,7 +1,8 @@
 import { getModel } from '@/lib/gemini'
 import { buildPrompt, getPromptTemplate, type PromptType } from '@/lib/prompts'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
+export const maxDuration = 30 // 30秒超时
 
 export async function POST(req: Request) {
   try {

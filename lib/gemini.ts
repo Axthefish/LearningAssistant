@@ -9,10 +9,10 @@ function getGeminiClient() {
     process.env.Gemini_API_KEY
   )
   
-  // Gemini 2.5 Pro 配置
-  // 基于官方文档：支持大规模上下文窗口和流式输出
+  // Gemini Pro 配置
+  // 使用稳定的gemini-pro模型
   return genAI.getGenerativeModel({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-pro',
     generationConfig: {
       temperature: 0.7, // 平衡创造性和一致性
       topP: 0.9,        // 核采样
