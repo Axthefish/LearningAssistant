@@ -9,10 +9,10 @@ function getGeminiClient() {
     process.env.Gemini_API_KEY
   )
   
-  // Gemini Pro 配置
-  // 使用稳定的gemini-pro模型
+  // Gemini 2.5 Pro 配置
+  // 使用正确的gemini-2.5-pro模型
   return genAI.getGenerativeModel({
-    model: 'gemini-pro',
+    model: 'gemini-2.5-pro',
     generationConfig: {
       temperature: 0.7, // 平衡创造性和一致性
       topP: 0.9,        // 核采样
