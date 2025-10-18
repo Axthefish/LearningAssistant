@@ -3,9 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["sin1"],
-  "env": {
-    "GOOGLE_GENERATIVE_AI_API_KEY": "@google-api-key"
-  }
+  "regions": ["sin1"]
 }
 
