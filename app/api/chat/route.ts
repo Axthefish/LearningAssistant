@@ -2,7 +2,7 @@ import { getModel } from '@/lib/gemini'
 import { buildPrompt, getPromptTemplate, type PromptType } from '@/lib/prompts'
 
 export const runtime = 'nodejs'
-export const maxDuration = 30 // 30秒超时
+export const maxDuration = 60 // 60秒超时（Vercel Pro支持）
 
 export async function POST(req: Request) {
   try {
