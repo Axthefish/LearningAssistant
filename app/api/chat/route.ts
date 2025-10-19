@@ -3,7 +3,7 @@ import { buildPrompt, getPromptTemplate, type PromptType } from '@/lib/prompts'
 
 // Vercel Serverless Function配置
 export const runtime = 'nodejs'
-export const maxDuration = 60 // Vercel Pro支持最多300秒
+export const maxDuration = 300 // 与Vercel Dashboard设置同步：300秒
 export const dynamic = 'force-dynamic' // 强制动态渲染
 
 export async function POST(req: Request) {
