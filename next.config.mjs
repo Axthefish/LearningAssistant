@@ -5,6 +5,10 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // 确保Vercel正确识别函数超时配置
+  serverRuntimeConfig: {
+    maxDuration: 60,
+  },
   webpack: (config, { isServer }) => {
     config.externals.push({
       'utf-8-validate': 'commonjs utf-8-validate',
@@ -30,4 +34,3 @@ const nextConfig = {
 }
 
 export default nextConfig
-
