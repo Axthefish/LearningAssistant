@@ -22,14 +22,9 @@ function getGeminiClient() {
   })
 }
 
-// Lazy initialization
-let modelInstance: ReturnType<typeof getGeminiClient> | null = null
-
+// 每次都创建新实例，避免Serverless环境的单例问题
 export function getModel() {
-  if (!modelInstance) {
-    modelInstance = getGeminiClient()
-  }
-  return modelInstance
+  return getGeminiClient()
 }
 
 export interface StreamChunk {

@@ -69,9 +69,16 @@ export function useChat(options: UseChatOptions = {}) {
                 if (parsed.type === 'content') {
                   accumulatedContent += parsed.text
                   setContent(accumulatedContent)
+                } else if (parsed.type === 'error') {
+                  // 处理stream中的错误
+                  throw new Error(parsed.text || 'Stream error')
                 }
               } catch (e) {
-                // 忽略解析错误
+                // 如果是JSON解析错误，忽略
+                // 如果是业务错误，抛出
+                if (e instanceof Error && e.message !== 'Unexpected token') {
+                  throw e
+                }
               }
             }
           }
