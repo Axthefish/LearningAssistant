@@ -36,6 +36,43 @@ export interface Scene3DData {
   }
 }
 
+// ============ 能量柱系统数据结构 ============
+
+export interface EnergyPillarParticle {
+  id: string
+  label: string
+  description: string
+  actionIndex: number
+}
+
+export interface EnergyPillar {
+  id: string
+  moduleId: string
+  moduleName: string
+  coreIdea: string
+  color: string
+  height: number
+  position: [number, number, number]
+  particles: EnergyPillarParticle[]
+}
+
+export interface EnergyConnection {
+  from: string // pillar id
+  to: string // pillar id
+  type: 'synergy' | 'tradeoff' | 'dependency' | 'feedback'
+  color: string
+  label: string
+}
+
+export interface EnergyPillarData {
+  pillars: EnergyPillar[]
+  connections: EnergyConnection[]
+  metadata: {
+    systemName: string
+    systemGoal: string
+  }
+}
+
 /**
  * 将通用框架转换为3D场景数据
  */
@@ -243,5 +280,144 @@ function getStatusColor(
       return baseColor // 保持原色
     default:
       return baseColor
+  }
+}
+
+/**
+ * 将通用框架转换为能量柱系统数据
+ */
+export function mapToEnergyPillarData(
+  framework: UniversalFramework
+): EnergyPillarData {
+  const pillars: EnergyPillar[] = []
+  const connections: EnergyConnection[] = []
+  
+  // 定义4个柱子的颜色和位置
+  const pillarColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+  const pillarPositions: [number, number, number][] = [
+    [-6, 0, 0],  // 左1
+    [-2, 0, 0],  // 左2
+    [2, 0, 0],   // 右1
+    [6, 0, 0],   // 右2
+  ]
+  
+  // 创建柱子（每个模块对应一根柱子）
+  framework.modules.forEach((module, moduleIndex) => {
+    const color = pillarColors[moduleIndex % 4]
+    const position = pillarPositions[moduleIndex % 4]
+    
+    // 每个Key Action对应一个粒子
+    const particles: EnergyPillarParticle[] = module.keyActions.map((action, actionIndex) => ({
+      id: `particle-${moduleIndex}-${actionIndex}`,
+      label: action.action,
+      description: action.example,
+      actionIndex,
+    }))
+    
+    // 根据Key Actions数量决定柱子高度（2-6单位）
+    const height = Math.max(2, Math.min(6, module.keyActions.length * 1.5))
+    
+    pillars.push({
+      id: `pillar-${moduleIndex}`,
+      moduleId: `module-${moduleIndex}`,
+      moduleName: module.name,
+      coreIdea: module.coreIdea,
+      color,
+      height,
+      position,
+      particles,
+    })
+  })
+  
+  // 创建柱子间的连接（基于dynamics）
+  if (framework.dynamics) {
+    const { synergy, tradeoff, dependency, feedbackLoop } = framework.dynamics
+    
+    // Synergy连接
+    if (synergy) {
+      const fromPillar = framework.modules.findIndex(
+        (m) => m.name === synergy.modulesInvolved[0]
+      )
+      const toPillar = framework.modules.findIndex(
+        (m) => m.name === synergy.modulesInvolved[1]
+      )
+      if (fromPillar !== -1 && toPillar !== -1) {
+        connections.push({
+          from: `pillar-${fromPillar}`,
+          to: `pillar-${toPillar}`,
+          type: 'synergy',
+          color: '#10b981',
+          label: synergy.effectName,
+        })
+      }
+    }
+    
+    // Trade-off连接
+    if (tradeoff) {
+      const fromPillar = framework.modules.findIndex(
+        (m) => m.name === tradeoff.modulesInvolved[0]
+      )
+      const toPillar = framework.modules.findIndex(
+        (m) => m.name === tradeoff.modulesInvolved[1]
+      )
+      if (fromPillar !== -1 && toPillar !== -1) {
+        connections.push({
+          from: `pillar-${fromPillar}`,
+          to: `pillar-${toPillar}`,
+          type: 'tradeoff',
+          color: '#f59e0b',
+          label: tradeoff.effectName,
+        })
+      }
+    }
+    
+    // Dependency连接
+    if (dependency) {
+      const fromPillar = framework.modules.findIndex(
+        (m) => m.name === dependency.modulesInvolved[0]
+      )
+      const toPillar = framework.modules.findIndex(
+        (m) => m.name === dependency.modulesInvolved[1]
+      )
+      if (fromPillar !== -1 && toPillar !== -1) {
+        connections.push({
+          from: `pillar-${fromPillar}`,
+          to: `pillar-${toPillar}`,
+          type: 'dependency',
+          color: '#8b5cf6',
+          label: dependency.effectName,
+        })
+      }
+    }
+    
+    // Feedback Loop连接
+    if (feedbackLoop && feedbackLoop.modulesInvolved.length >= 2) {
+      for (let i = 0; i < feedbackLoop.modulesInvolved.length; i++) {
+        const fromPillar = framework.modules.findIndex(
+          (m) => m.name === feedbackLoop.modulesInvolved[i]
+        )
+        const toPillar = framework.modules.findIndex(
+          (m) => m.name === feedbackLoop.modulesInvolved[(i + 1) % feedbackLoop.modulesInvolved.length]
+        )
+        if (fromPillar !== -1 && toPillar !== -1) {
+          connections.push({
+            from: `pillar-${fromPillar}`,
+            to: `pillar-${toPillar}`,
+            type: 'feedback',
+            color: '#ec4899',
+            label: i === 0 ? feedbackLoop.effectName : '',
+          })
+        }
+      }
+    }
+  }
+  
+  return {
+    pillars,
+    connections,
+    metadata: {
+      systemName: framework.systemName || 'Universal Action System',
+      systemGoal: framework.systemGoal || '',
+    },
   }
 }
