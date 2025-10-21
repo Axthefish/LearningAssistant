@@ -77,15 +77,15 @@ export function parseUniversalFramework(markdown: string): UniversalFramework {
         }
       }
       
-      // Key Actions（过滤掉标题本身）
+      // Key Actions（过滤掉标题本身和没有具体描述的行）
       if (currentModule && line.match(/^\*\s+\*\*(.+?)\*\*:/)) {
         const actionMatch = line.match(/^\*\s+\*\*(.+?)\*\*:\s*(.*)/)
         if (actionMatch) {
           const action = actionMatch[1].trim()
           const description = actionMatch[2].trim()
           
-          // 跳过标题行（如"Key Actions"、"Core Idea"等）
-          if (action === 'Key Actions' || action === 'Core Idea' || action === 'Example') {
+          // 跳过标题行和空描述（Key Actions通常后面没有冒号后内容）
+          if (action === 'Key Actions' || action === 'Core Idea' || action === 'Example' || !description) {
             continue
           }
           

@@ -26,12 +26,15 @@ export default function UniversalFrameworkPage() {
   const [parsedFramework, setParsedFramework] = useState<UniversalFramework | null>(null)
   const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [isNavigating, setIsNavigating] = useState(false)
+  const [markdownContent, setMarkdownContent] = useState('')
   
   const { content, isStreaming, sendMessage } = useChat({
     onFinish: (finalContent) => {
       // 解析markdown为结构化数据
       const parsed = parseUniversalFramework(finalContent)
       setParsedFramework(parsed)
+      setMarkdownContent(finalContent)
       
       // 转换为能量柱数据
       const pillarData = mapToEnergyPillarData(parsed)
@@ -56,6 +59,7 @@ export default function UniversalFrameworkPage() {
       setParsedFramework(existingFramework)
       const pillarData = mapToEnergyPillarData(existingFramework)
       setEnergyPillarData(pillarData)
+      setMarkdownContent(existingFramework.rawMarkdown)
       setShowConfirmation(true)
       return
     }
@@ -70,6 +74,7 @@ export default function UniversalFrameworkPage() {
   }, [])
   
   const handleConfirmPersonalization = async () => {
+    setIsNavigating(true)
     await confirmPersonalization()
     router.push('/diagnosis')
   }
@@ -87,9 +92,22 @@ export default function UniversalFrameworkPage() {
               </p>
             </div>
             {showConfirmation && (
-              <Button onClick={handleConfirmPersonalization} size="lg">
-                生成个性化方案
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button 
+                onClick={handleConfirmPersonalization} 
+                size="lg"
+                disabled={isNavigating}
+              >
+                {isNavigating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    处理中...
+                  </>
+                ) : (
+                  <>
+                    生成个性化方案
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
             )}
           </div>
@@ -107,14 +125,14 @@ export default function UniversalFrameworkPage() {
                 thinkingText="正在构建通用框架，分析核心模块和系统动态..."
               />
               
-              {content && (
+              {(content || markdownContent) && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   <Card className="p-6">
                     <StreamingMessage
-                      content={content}
+                      content={content || markdownContent}
                       isStreaming={isStreaming}
                     />
                   </Card>

@@ -865,10 +865,12 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
         <div className={`absolute top-0 right-0 h-full bg-background/95 backdrop-blur-xl border-l transition-all duration-300 z-40 ${
           sidebarOpen ? 'w-80' : 'w-12'
         }`}>
-          {/* 展开/收起按钮 */}
+          {/* 展开/收起按钮（固定在侧边栏上）*/}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="absolute top-4 -left-10 bg-black/80 text-white p-2 rounded-l-lg hover:bg-black/90 transition-colors border border-r-0 border-white/10"
+            className={`absolute top-4 bg-black/80 text-white p-2 rounded-lg hover:bg-black/90 transition-all border border-white/10 ${
+              sidebarOpen ? '-left-10' : 'left-2'
+            }`}
           >
             {sidebarOpen ? '→' : '←'}
           </button>
