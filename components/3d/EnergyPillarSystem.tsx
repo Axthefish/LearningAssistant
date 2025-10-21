@@ -16,6 +16,7 @@ import type { EnergyPillarData, EnergyPillar } from '@/lib/3d-mapper'
 interface EnergyPillarSystemProps {
   data: EnergyPillarData
   onPillarClick?: (pillar: EnergyPillar) => void
+  showConnections?: boolean
 }
 
 interface TooltipState {
@@ -26,7 +27,7 @@ interface TooltipState {
   subtitle: string
 }
 
-export function EnergyPillarSystem({ data, onPillarClick }: EnergyPillarSystemProps) {
+export function EnergyPillarSystem({ data, onPillarClick, showConnections = false }: EnergyPillarSystemProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
@@ -195,42 +196,75 @@ export function EnergyPillarSystem({ data, onPillarClick }: EnergyPillarSystemPr
     
     // ============ 创建连接线系统 ============
     const connectionsGroup = new THREE.Group()
-    connectionsGroup.visible = false // 默认隐藏
+    connectionsGroup.visible = true // 默认显示（但很淡）
     connectionsRef.current = connectionsGroup
     scene.add(connectionsGroup)
+    
+    console.log('📊 Connections data:', data.connections)
+    console.log('📊 Pillars:', data.pillars.map(p => ({ id: p.id, pos: p.position })))
     
     data.connections.forEach((conn) => {
       const fromPillar = data.pillars.find(p => p.id === conn.from)
       const toPillar = data.pillars.find(p => p.id === conn.to)
       
-      if (!fromPillar || !toPillar) return
+      console.log(`🔗 Creating ${conn.type} connection:`, {
+        from: conn.from,
+        to: conn.to,
+        fromFound: !!fromPillar,
+        toFound: !!toPillar
+      })
       
-      // 连接线起点和终点（柱子中部）
+      if (!fromPillar || !toPillar) {
+        console.warn('⚠️ Missing pillar for connection:', conn)
+        return
+      }
+      
+      // 连接线起点和终点（分层显示：不同类型在不同高度）
+      const heightOffsets: Record<string, number> = {
+        synergy: 0.7,      // 高层
+        tradeoff: 0.5,     // 中高层
+        dependency: 0.3,   // 中低层
+        feedback: 0.1,     // 低层
+      }
+      
+      const yOffset = heightOffsets[conn.type] || 0.5
+      
       const fromPos = new THREE.Vector3(
         fromPillar.position[0],
-        fromPillar.height / 2,
+        fromPillar.height * yOffset,
         fromPillar.position[2]
       )
       const toPos = new THREE.Vector3(
         toPillar.position[0],
-        toPillar.height / 2,
+        toPillar.height * yOffset,
         toPillar.position[2]
       )
       
       // 根据类型创建不同的连接线
+      let connectionMesh: THREE.Object3D | null = null
+      
       switch (conn.type) {
         case 'synergy':
-          createSynergyConnection(fromPos, toPos, conn.color, connectionsGroup)
+          connectionMesh = createSynergyConnection(fromPos, toPos, conn.color, connectionsGroup)
           break
         case 'tradeoff':
-          createTradeoffConnection(fromPos, toPos, conn.color, connectionsGroup)
+          connectionMesh = createTradeoffConnection(fromPos, toPos, conn.color, connectionsGroup)
           break
         case 'dependency':
-          createDependencyConnection(fromPos, toPos, conn.color, connectionsGroup)
+          connectionMesh = createDependencyConnection(fromPos, toPos, conn.color, connectionsGroup)
           break
         case 'feedback':
-          createFeedbackConnection(fromPos, toPos, conn.color, connectionsGroup)
+          connectionMesh = createFeedbackConnection(fromPos, toPos, conn.color, connectionsGroup)
           break
+      }
+      
+      // 存储连接关系元数据
+      if (connectionMesh) {
+        connectionMesh.userData = {
+          fromPillarId: conn.from,
+          toPillarId: conn.to,
+          connectionType: conn.type,
+        }
       }
     })
     
@@ -426,6 +460,7 @@ export function EnergyPillarSystem({ data, onPillarClick }: EnergyPillarSystemPr
   
   // ============ Hover效果 ============
   useEffect(() => {
+    // 更新柱子状态
     pillarsRef.current.forEach((group, pillarId) => {
       const isHovered = pillarId === hoveredPillar
       const isFocused = pillarId === focusedPillar
@@ -444,7 +479,48 @@ export function EnergyPillarSystem({ data, onPillarClick }: EnergyPillarSystemPr
         }
       })
     })
-  }, [hoveredPillar, focusedPillar])
+    
+    // 更新连接线状态（按需高亮）
+    if (connectionsRef.current && showConnections) {
+      connectionsRef.current.children.forEach((connection) => {
+        const fromId = connection.userData.fromPillarId
+        const toId = connection.userData.toPillarId
+        
+        // 检查连接线是否与当前hover/focus的柱子相关
+        const isRelated = 
+          hoveredPillar === fromId || 
+          hoveredPillar === toId || 
+          focusedPillar === fromId || 
+          focusedPillar === toId
+        
+        // 根据是否相关设置不同的可见度
+        if (connection instanceof THREE.Mesh) {
+          const mat = connection.material as THREE.MeshStandardMaterial
+          if (hoveredPillar || focusedPillar) {
+            // 有柱子被hover/focus时
+            mat.opacity = isRelated ? 0.7 : 0.05 // 相关的高亮，其他的几乎隐藏
+            mat.emissiveIntensity = isRelated ? 0.6 : 0.1
+          } else {
+            // 没有柱子被hover/focus时，恢复默认淡显示
+            mat.opacity = 0.15
+            mat.emissiveIntensity = 0.2
+          }
+        } else if (connection instanceof THREE.ArrowHelper) {
+          // 处理箭头类型的连接（dependency）
+          const lineMat = connection.line.material as THREE.LineBasicMaterial
+          const coneMat = connection.cone.material as THREE.MeshBasicMaterial
+          
+          if (hoveredPillar || focusedPillar) {
+            lineMat.opacity = isRelated ? 0.7 : 0.05
+            coneMat.opacity = isRelated ? 0.7 : 0.05
+          } else {
+            lineMat.opacity = 0.15
+            coneMat.opacity = 0.15
+          }
+        }
+      })
+    }
+  }, [hoveredPillar, focusedPillar, showConnections])
   
   // ============ Focus效果：粒子展开 ============
   useEffect(() => {
@@ -468,6 +544,13 @@ export function EnergyPillarSystem({ data, onPillarClick }: EnergyPillarSystemPr
       })
     })
   }, [focusedPillar])
+  
+  // ============ 连接线显示控制 ============
+  useEffect(() => {
+    if (connectionsRef.current) {
+      connectionsRef.current.visible = showConnections
+    }
+  }, [showConnections])
   
   return (
     <div className="relative w-full h-full">
@@ -507,8 +590,8 @@ function createSynergyConnection(
   to: THREE.Vector3,
   color: string,
   parent: THREE.Group
-) {
-  // 协同：平滑弧线
+): THREE.Mesh {
+  // 协同：平滑弧线（使用管道几何体）
   const curve = new THREE.QuadraticBezierCurve3(
     from,
     new THREE.Vector3(
@@ -519,17 +602,20 @@ function createSynergyConnection(
     to
   )
   
-  const points = curve.getPoints(50)
-  const geometry = new THREE.BufferGeometry().setFromPoints(points)
-  const material = new THREE.LineBasicMaterial({
+  const tubeGeometry = new THREE.TubeGeometry(curve, 30, 0.08, 8, false)
+  const material = new THREE.MeshStandardMaterial({
     color: new THREE.Color(color),
+    emissive: new THREE.Color(color),
+    emissiveIntensity: 0.2, // 默认低发光
     transparent: true,
-    opacity: 0.6,
-    linewidth: 2,
+    opacity: 0.15, // 默认很淡
   })
   
-  const line = new THREE.Line(geometry, material)
-  parent.add(line)
+  const tube = new THREE.Mesh(tubeGeometry, material)
+  parent.add(tube)
+  
+  console.log('✅ Created synergy connection tube')
+  return tube
 }
 
 function createTradeoffConnection(
@@ -537,8 +623,8 @@ function createTradeoffConnection(
   to: THREE.Vector3,
   color: string,
   parent: THREE.Group
-) {
-  // 权衡：震荡的正弦波
+): THREE.Mesh {
+  // 权衡：震荡的正弦波（使用管道）
   const points: THREE.Vector3[] = []
   const steps = 50
   
@@ -550,15 +636,21 @@ function createTradeoffConnection(
     points.push(new THREE.Vector3(x, y, z))
   }
   
-  const geometry = new THREE.BufferGeometry().setFromPoints(points)
-  const material = new THREE.LineBasicMaterial({
+  const curve = new THREE.CatmullRomCurve3(points)
+  const tubeGeometry = new THREE.TubeGeometry(curve, 30, 0.08, 8, false)
+  const material = new THREE.MeshStandardMaterial({
     color: new THREE.Color(color),
+    emissive: new THREE.Color(color),
+    emissiveIntensity: 0.2, // 默认低发光
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.15, // 默认很淡
   })
   
-  const line = new THREE.Line(geometry, material)
-  parent.add(line)
+  const tube = new THREE.Mesh(tubeGeometry, material)
+  parent.add(tube)
+  
+  console.log('✅ Created tradeoff connection tube')
+  return tube
 }
 
 function createDependencyConnection(
@@ -566,7 +658,7 @@ function createDependencyConnection(
   to: THREE.Vector3,
   color: string,
   parent: THREE.Group
-) {
+): THREE.ArrowHelper {
   // 依赖：直线箭头
   const direction = new THREE.Vector3().subVectors(to, from)
   const length = direction.length()
@@ -580,12 +672,17 @@ function createDependencyConnection(
     0.2
   )
   
-  // 设置材质属性
+  // 设置材质属性 - 默认很淡
   const lineMaterial = arrowHelper.line.material as THREE.LineBasicMaterial
   lineMaterial.transparent = true
-  lineMaterial.opacity = 0.6
+  lineMaterial.opacity = 0.15
+  
+  const coneMaterial = arrowHelper.cone.material as THREE.MeshBasicMaterial
+  coneMaterial.transparent = true
+  coneMaterial.opacity = 0.15
   
   parent.add(arrowHelper)
+  return arrowHelper
 }
 
 function createFeedbackConnection(
@@ -593,8 +690,8 @@ function createFeedbackConnection(
   to: THREE.Vector3,
   color: string,
   parent: THREE.Group
-) {
-  // 反馈：螺旋线
+): THREE.Mesh {
+  // 反馈：螺旋线（使用管道）
   const points: THREE.Vector3[] = []
   const steps = 50
   
@@ -616,14 +713,20 @@ function createFeedbackConnection(
     ))
   }
   
-  const geometry = new THREE.BufferGeometry().setFromPoints(points)
-  const material = new THREE.LineBasicMaterial({
+  const curve = new THREE.CatmullRomCurve3(points)
+  const tubeGeometry = new THREE.TubeGeometry(curve, 30, 0.08, 8, false)
+  const material = new THREE.MeshStandardMaterial({
     color: new THREE.Color(color),
+    emissive: new THREE.Color(color),
+    emissiveIntensity: 0.2, // 默认低发光
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.15, // 默认很淡
   })
   
-  const line = new THREE.Line(geometry, material)
-  parent.add(line)
+  const tube = new THREE.Mesh(tubeGeometry, material)
+  parent.add(tube)
+  
+  console.log('✅ Created feedback connection tube')
+  return tube
 }
 

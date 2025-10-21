@@ -390,24 +390,22 @@ export function mapToEnergyPillarData(
       }
     }
     
-    // Feedback Loop连接
+    // Feedback Loop连接（优化：合并为单条闭环）
     if (feedbackLoop && feedbackLoop.modulesInvolved.length >= 2) {
-      for (let i = 0; i < feedbackLoop.modulesInvolved.length; i++) {
-        const fromPillar = framework.modules.findIndex(
-          (m) => m.name === feedbackLoop.modulesInvolved[i]
-        )
-        const toPillar = framework.modules.findIndex(
-          (m) => m.name === feedbackLoop.modulesInvolved[(i + 1) % feedbackLoop.modulesInvolved.length]
-        )
-        if (fromPillar !== -1 && toPillar !== -1) {
-          connections.push({
-            from: `pillar-${fromPillar}`,
-            to: `pillar-${toPillar}`,
-            type: 'feedback',
-            color: '#ec4899',
-            label: i === 0 ? feedbackLoop.effectName : '',
-          })
-        }
+      // 只创建一个特殊的feedback连接，包含所有模块ID
+      const pillarIndices = feedbackLoop.modulesInvolved
+        .map(name => framework.modules.findIndex(m => m.name === name))
+        .filter(idx => idx !== -1)
+      
+      if (pillarIndices.length >= 2) {
+        // 从第一个到最后一个，形成闭环
+        connections.push({
+          from: `pillar-${pillarIndices[0]}`,
+          to: `pillar-${pillarIndices[pillarIndices.length - 1]}`,
+          type: 'feedback',
+          color: '#ec4899',
+          label: feedbackLoop.effectName,
+        })
       }
     }
   }

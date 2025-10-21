@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { EnergyPillarSystem } from '@/components/3d/EnergyPillarSystem'
+import { EnergyPillarSystemPro } from '@/components/3d/EnergyPillarSystemPro'
 import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import type { EnergyPillar, EnergyPillarData } from '@/lib/3d-mapper'
 import type { UniversalFramework } from '@/lib/types'
@@ -109,15 +109,9 @@ const mockFramework: UniversalFramework = {
 export default function TestEnergyPillarPage() {
   const [pillarData] = useState<EnergyPillarData>(() => mapToEnergyPillarData(mockFramework))
   const [selectedPillar, setSelectedPillar] = useState<EnergyPillar | null>(null)
-  const [showConnections, setShowConnections] = useState(false)
   
   const handlePillarClick = (pillar: EnergyPillar) => {
     setSelectedPillar(pillar)
-  }
-  
-  const handleReset = () => {
-    setSelectedPillar(null)
-    setShowConnections(false)
   }
   
   return (
@@ -132,22 +126,6 @@ export default function TestEnergyPillarPage() {
                 {pillarData.metadata.systemName}
               </p>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={showConnections ? 'default' : 'outline'}
-                onClick={() => setShowConnections(!showConnections)}
-                size="sm"
-              >
-                {showConnections ? '隐藏' : '显示'}连接线
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleReset}
-                size="sm"
-              >
-                重置视图
-              </Button>
-            </div>
           </div>
         </div>
       </div>
@@ -157,7 +135,7 @@ export default function TestEnergyPillarPage() {
         <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-0">
           {/* Left: 3D Scene */}
           <div className="lg:col-span-2 relative bg-muted/20">
-            <EnergyPillarSystem
+            <EnergyPillarSystemPro
               data={pillarData}
               onPillarClick={handlePillarClick}
             />
@@ -248,48 +226,48 @@ export default function TestEnergyPillarPage() {
               </Card>
             )}
             
-            {/* Connections */}
-            {showConnections && (
-              <Card className="p-4">
-                <h3 className="font-semibold mb-3">系统动态</h3>
-                <div className="space-y-3">
-                  {pillarData.connections.map((conn, index) => {
-                    const fromPillar = pillarData.pillars.find(p => p.id === conn.from)
-                    const toPillar = pillarData.pillars.find(p => p.id === conn.to)
-                    
-                    return (
-                      <div key={index} className="p-3 rounded-lg bg-muted/50">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge
-                            variant="outline"
-                            style={{ borderColor: conn.color, color: conn.color }}
-                          >
-                            {conn.type === 'synergy' && '协同'}
-                            {conn.type === 'tradeoff' && '权衡'}
-                            {conn.type === 'dependency' && '依赖'}
-                            {conn.type === 'feedback' && '反馈'}
-                          </Badge>
-                          <span className="text-xs font-medium">{conn.label}</span>
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {fromPillar?.moduleName} → {toPillar?.moduleName}
-                        </div>
+            {/* Connections - 默认显示在3D场景中 */}
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3">系统动态</h3>
+              <div className="space-y-3">
+                {pillarData.connections.map((conn, index) => {
+                  const fromPillar = pillarData.pillars.find(p => p.id === conn.from)
+                  const toPillar = pillarData.pillars.find(p => p.id === conn.to)
+                  
+                  return (
+                    <div key={index} className="p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          variant="outline"
+                          style={{ borderColor: conn.color, color: conn.color }}
+                        >
+                          {conn.type === 'synergy' && '协同'}
+                          {conn.type === 'tradeoff' && '权衡'}
+                          {conn.type === 'dependency' && '依赖'}
+                          {conn.type === 'feedback' && '反馈'}
+                        </Badge>
+                        <span className="text-xs font-medium">{conn.label}</span>
                       </div>
-                    )
-                  })}
-                </div>
-              </Card>
-            )}
+                      <div className="text-xs text-muted-foreground">
+                        {fromPillar?.moduleName} → {toPillar?.moduleName}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </Card>
             
-            {/* Test Info */}
-            <Card className="p-4 bg-blue-50 dark:bg-blue-950/20">
-              <h4 className="font-medium text-sm mb-2 text-blue-900 dark:text-blue-100">
-                🧪 测试模式
+            {/* Professional Version Info */}
+            <Card className="p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20 border-purple-200 dark:border-purple-800">
+              <h4 className="font-medium text-sm mb-2 text-purple-900 dark:text-purple-100">
+                ✨ 专业版 Pro
               </h4>
-              <p className="text-xs text-blue-700 dark:text-blue-300">
-                这是能量柱3D可视化系统的测试页面。
-                使用mock数据展示功能，验证设计效果和用户体验。
-              </p>
+              <ul className="text-xs text-purple-700 dark:text-purple-300 space-y-1">
+                <li>• 玻璃质感小球，自然堆叠</li>
+                <li>• 流动粒子连接线，优雅不廉价</li>
+                <li>• Hover自动高亮相关连接</li>
+                <li>• Click展开详情，丝滑动画</li>
+              </ul>
             </Card>
           </div>
         </div>
