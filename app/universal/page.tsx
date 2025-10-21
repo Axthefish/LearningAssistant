@@ -6,16 +6,15 @@ import { useStore, useMissionStatement } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
-import { UniversalFramework3D } from '@/components/3d/UniversalFramework3D'
-import { NodeDetailModal } from '@/components/NodeDetailModal'
-import { mapUniversalFrameworkTo3D } from '@/lib/3d-mapper'
+import { EnergyPillarSystemPro } from '@/components/3d/EnergyPillarSystemPro'
+import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parseUniversalFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ArrowRight, Box } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { UniversalFramework } from '@/lib/types'
-import type { Scene3DData, Node3D } from '@/lib/3d-mapper'
+import type { EnergyPillarData } from '@/lib/3d-mapper'
 
 export default function UniversalFrameworkPage() {
   const router = useRouter()
@@ -25,10 +24,8 @@ export default function UniversalFrameworkPage() {
   const confirmPersonalization = useStore(state => state.confirmPersonalization)
   
   const [parsedFramework, setParsedFramework] = useState<UniversalFramework | null>(null)
-  const [scene3DData, setScene3DData] = useState<Scene3DData | null>(null)
+  const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [selectedNode, setSelectedNode] = useState<Node3D | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
   
   const { content, isStreaming, sendMessage } = useChat({
     onFinish: (finalContent) => {
@@ -36,9 +33,9 @@ export default function UniversalFrameworkPage() {
       const parsed = parseUniversalFramework(finalContent)
       setParsedFramework(parsed)
       
-      // 转换为3D场景数据
-      const sceneData = mapUniversalFrameworkTo3D(parsed)
-      setScene3DData(sceneData)
+      // 转换为能量柱数据
+      const pillarData = mapToEnergyPillarData(parsed)
+      setEnergyPillarData(pillarData)
       
       // 保存到store
       setUniversalFramework(parsed)
@@ -57,8 +54,8 @@ export default function UniversalFrameworkPage() {
     // 如果已有框架，直接使用，避免重复调用AI
     if (existingFramework) {
       setParsedFramework(existingFramework)
-      const sceneData = mapUniversalFrameworkTo3D(existingFramework)
-      setScene3DData(sceneData)
+      const pillarData = mapToEnergyPillarData(existingFramework)
+      setEnergyPillarData(pillarData)
       setShowConfirmation(true)
       return
     }
@@ -75,11 +72,6 @@ export default function UniversalFrameworkPage() {
   const handleConfirmPersonalization = async () => {
     await confirmPersonalization()
     router.push('/diagnosis')
-  }
-  
-  const handleNodeClick = (node: Node3D) => {
-    setSelectedNode(node)
-    setModalOpen(true)
   }
   
   return (
@@ -159,7 +151,7 @@ export default function UniversalFrameworkPage() {
           
           {/* Right: 3D Visualization */}
           <div className="relative bg-muted/20">
-            {!scene3DData ? (
+            {!energyPillarData ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <Box className="w-16 h-16 mx-auto text-muted-foreground animate-pulse" />
@@ -175,32 +167,14 @@ export default function UniversalFrameworkPage() {
                 transition={{ duration: 0.5 }}
                 className="h-full"
               >
-                <UniversalFramework3D
-                  data={scene3DData}
-                  onNodeClick={handleNodeClick}
+                <EnergyPillarSystemPro
+                  data={energyPillarData}
                 />
-                
-                {/* 3D Controls Info */}
-                <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg text-sm">
-                  <p className="font-medium mb-1">💡 提示</p>
-                  <ul className="space-y-1 text-xs">
-                    <li>• 拖拽旋转查看</li>
-                    <li>• 悬停查看详情</li>
-                    <li>• 点击节点深入了解</li>
-                  </ul>
-                </div>
               </motion.div>
             )}
           </div>
         </div>
       </div>
-      
-      {/* Node Detail Modal */}
-      <NodeDetailModal
-        node={selectedNode}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-      />
     </div>
   )
 }

@@ -43,6 +43,10 @@ export interface EnergyPillarParticle {
   label: string
   description: string
   actionIndex: number
+  // 个性化字段
+  status?: 'strength' | 'opportunity' | 'maintenance'
+  coachNote?: string
+  nextMoves?: string[]
 }
 
 export interface EnergyPillar {
@@ -287,8 +291,9 @@ function getStatusColor(
  * 将通用框架转换为能量柱系统数据
  */
 export function mapToEnergyPillarData(
-  framework: UniversalFramework
+  framework: UniversalFramework | PersonalizedFramework
 ): EnergyPillarData {
+  const isPersonalized = 'actionMap' in framework
   const pillars: EnergyPillar[] = []
   const connections: EnergyConnection[] = []
   
@@ -307,12 +312,41 @@ export function mapToEnergyPillarData(
     const position = pillarPositions[moduleIndex % 4]
     
     // 每个Key Action对应一个粒子
-    const particles: EnergyPillarParticle[] = module.keyActions.map((action, actionIndex) => ({
-      id: `particle-${moduleIndex}-${actionIndex}`,
-      label: action.action,
-      description: action.example,
-      actionIndex,
-    }))
+    const particles: EnergyPillarParticle[] = module.keyActions.map((action, actionIndex) => {
+      // 查找个性化状态
+      let status: 'strength' | 'opportunity' | 'maintenance' | undefined
+      let coachNote: string | undefined
+      let nextMoves: string[] | undefined
+      
+      if (isPersonalized) {
+        const personalizedFramework = framework as PersonalizedFramework
+        const actionInfo = personalizedFramework.actionMap?.find(
+          (a) => {
+            const normalizedLabel = action.action.toLowerCase().trim()
+            const normalizedAction = a.action.toLowerCase().trim()
+            return normalizedLabel.includes(normalizedAction) || 
+                   normalizedAction.includes(normalizedLabel) ||
+                   a.module === module.name
+          }
+        )
+        
+        if (actionInfo) {
+          status = actionInfo.status
+          coachNote = actionInfo.coachNote
+          nextMoves = actionInfo.nextMoves
+        }
+      }
+      
+      return {
+        id: `particle-${moduleIndex}-${actionIndex}`,
+        label: action.action,
+        description: action.example,
+        actionIndex,
+        status,
+        coachNote,
+        nextMoves,
+      }
+    })
     
     // 根据Key Actions数量决定柱子高度（2-6单位）
     const height = Math.max(2, Math.min(6, module.keyActions.length * 1.5))

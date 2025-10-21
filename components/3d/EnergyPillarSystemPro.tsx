@@ -28,6 +28,19 @@ interface TooltipState {
   subtitle: string
 }
 
+interface InfoCard {
+  id: string
+  label: string
+  description: string
+  x: number
+  y: number
+  visible: boolean
+  // 个性化字段
+  status?: 'strength' | 'opportunity' | 'maintenance'
+  coachNote?: string
+  nextMoves?: string[]
+}
+
 // 粒子流系统
 interface ParticleTrail {
   particles: THREE.Points
@@ -59,6 +72,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
     title: '',
     subtitle: '',
   })
+  const [infoCards, setInfoCards] = useState<InfoCard[]>([])
   
   // ============ 主场景初始化 ============
   useEffect(() => {
@@ -74,23 +88,99 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
     scene.background = new THREE.Color(0x0a0a14)
     sceneRef.current = scene
     
-    // 星空
-    const starsGeo = new THREE.BufferGeometry()
-    const starVertices = []
-    for (let i = 0; i < 500; i++) {
-      starVertices.push(
+    // ============ 星空系统（圆形星星）============
+    
+    // 创建圆形星星纹理
+    const starCanvas = document.createElement('canvas')
+    starCanvas.width = 32
+    starCanvas.height = 32
+    const starCtx = starCanvas.getContext('2d')!
+    
+    // 绘制圆形渐变（中心亮，边缘淡）
+    const gradient = starCtx.createRadialGradient(16, 16, 0, 16, 16, 16)
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
+    gradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.8)')
+    gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.3)')
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+    
+    starCtx.fillStyle = gradient
+    starCtx.fillRect(0, 0, 32, 32)
+    
+    const starTexture = new THREE.CanvasTexture(starCanvas)
+    
+    // 第一层：远处的小星星（密集背景）
+    const farStarsGeo = new THREE.BufferGeometry()
+    const farStarsPos = []
+    for (let i = 0; i < 3000; i++) {
+      farStarsPos.push(
+        (Math.random() - 0.5) * 150,
+        (Math.random() - 0.5) * 150,
+        (Math.random() - 0.5) * 150
+      )
+    }
+    farStarsGeo.setAttribute('position', new THREE.Float32BufferAttribute(farStarsPos, 3))
+    const farStars = new THREE.Points(farStarsGeo, new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.15,
+      map: starTexture,
+      transparent: true,
+      opacity: 0.5,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }))
+    scene.add(farStars)
+    
+    // 第二层：中距离的星星（白色，较大）
+    const midStarsGeo = new THREE.BufferGeometry()
+    const midStarsPos = []
+    for (let i = 0; i < 800; i++) {
+      midStarsPos.push(
         (Math.random() - 0.5) * 100,
         (Math.random() - 0.5) * 100,
         (Math.random() - 0.5) * 100
       )
     }
-    starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3))
-    scene.add(new THREE.Points(starsGeo, new THREE.PointsMaterial({ 
-      color: 0xffffff, 
-      size: 0.05, 
-      transparent: true, 
-      opacity: 0.6 
-    })))
+    midStarsGeo.setAttribute('position', new THREE.Float32BufferAttribute(midStarsPos, 3))
+    const midStars = new THREE.Points(midStarsGeo, new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.25,
+      map: starTexture,
+      transparent: true,
+      opacity: 0.7,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }))
+    scene.add(midStars)
+    
+    // 第三层：近处的明亮星星（白色，大而亮）
+    const nearStarsGeo = new THREE.BufferGeometry()
+    const nearStarsPos = []
+    for (let i = 0; i < 300; i++) {
+      nearStarsPos.push(
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80,
+        (Math.random() - 0.5) * 80
+      )
+    }
+    nearStarsGeo.setAttribute('position', new THREE.Float32BufferAttribute(nearStarsPos, 3))
+    const nearStars = new THREE.Points(nearStarsGeo, new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.4,
+      map: starTexture,
+      transparent: true,
+      opacity: 0.9,
+      sizeAttenuation: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }))
+    scene.add(nearStars)
+    
+    // 保存星空图层用于动画
+    const starLayers = { far: farStars, mid: midStars, near: nearStars }
+    
+    console.log('✅ Round stars created: far(3000) + mid(800) + near(300) = 4100 stars')
     
     // 相机
     const camera = new THREE.PerspectiveCamera(
@@ -167,18 +257,22 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
       const sphereGap = 0.48 // 堆叠间隙
       
       pillarData.particles.forEach((particleData, index) => {
-        // 玻璃材质小球
-        const sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 32)
-        const sphereMaterial = new THREE.MeshPhysicalMaterial({
-          color: new THREE.Color(pillarData.color),
-          transmission: 0.95, // 高透明度
-          thickness: 0.5,
-          roughness: 0.05, // 很光滑
-          metalness: 0,
-          transparent: true,
-          opacity: 0.9,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.1,
+        // 根据status决定颜色
+        let sphereColor = 0xffffff // 默认白色
+        let sphereScale = 1.0
+        
+        if (particleData.status === 'strength') {
+          sphereColor = 0x10b981 // 绿色
+        } else if (particleData.status === 'opportunity') {
+          sphereColor = 0xf97316 // 橙色
+          sphereScale = 1.2 // 机会区域更大
+        }
+        
+        // 发光小球（根据状态着色）
+        const sphereGeometry = new THREE.SphereGeometry(sphereRadius * sphereScale, 32, 32)
+        const sphereMaterial = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(sphereColor),
+          transparent: false,
         })
         
         const sphereMesh = new THREE.Mesh(sphereGeometry, sphereMaterial)
@@ -313,6 +407,30 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
       animationFrameRef.current = requestAnimationFrame(animate)
       
       const time = Date.now() * 0.001
+      
+      // 星空缓慢旋转（增加深度感和动态）
+      if (starLayers.far) {
+        starLayers.far.rotation.y = time * 0.015
+        starLayers.far.rotation.x = time * 0.008
+      }
+      if (starLayers.mid) {
+        starLayers.mid.rotation.y = time * 0.025
+        starLayers.mid.rotation.x = -time * 0.012
+      }
+      if (starLayers.near) {
+        starLayers.near.rotation.y = time * 0.035
+        starLayers.near.rotation.z = time * 0.005
+      }
+      
+      // 星星闪烁效果（通过调整材质opacity）
+      const farMat = starLayers.far.material as THREE.PointsMaterial
+      const midMat = starLayers.mid.material as THREE.PointsMaterial
+      const nearMat = starLayers.near.material as THREE.PointsMaterial
+      
+      // 不同层用不同频率闪烁
+      farMat.opacity = 0.4 + Math.sin(time * 0.5) * 0.15
+      midMat.opacity = 0.6 + Math.sin(time * 0.7 + 1) * 0.2
+      nearMat.opacity = 0.8 + Math.sin(time * 0.9 + 2) * 0.2
       
       // 更新相机位置
       camera.position.x = cameraDistance * Math.sin(cameraRotation.phi) * Math.cos(cameraRotation.theta)
@@ -487,41 +605,132 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
       const mat = trail.particles.material as THREE.PointsMaterial
       
       if (hoveredPillar || focusedPillar) {
-        mat.opacity = isRelated ? 0.6 : 0.02
-        trail.speed = isRelated ? 0.01 : 0.002 // 相关的加速
+        mat.opacity = isRelated ? 0.7 : 0.05 // 相关的高亮，无关的几乎隐藏
+        trail.speed = isRelated ? 0.015 : 0.002 // 相关的明显加速
       } else {
-        mat.opacity = 0.08 // 默认很淡
-        trail.speed = 0.003
+        mat.opacity = 0.2 // 默认淡但可见
+        trail.speed = 0.004
       }
     })
   }, [hoveredPillar, focusedPillar])
   
-  // ============ Focus展开效果 ============
+  // ============ Focus展开效果：3D信息卡片 ============
   useEffect(() => {
-    spheresRef.current.forEach((pillarSpheres, pillarId) => {
-      const isFocused = pillarId === focusedPillar
+    if (!focusedPillar || !cameraRef.current || !containerRef.current) {
+      setInfoCards([])
+      return
+    }
+    
+    const camera = cameraRef.current
+    const container = containerRef.current
+    const pillarGroup = pillarsRef.current.get(focusedPillar)
+    const pillarSpheres = spheresRef.current.get(focusedPillar)
+    
+    if (!pillarGroup || !pillarSpheres) {
+      setInfoCards([])
+      return
+    }
+    
+    // 计算每个小球的3D位置并投影到2D屏幕坐标
+    const cards: InfoCard[] = []
+    const cardHeight = 80 // 估算的卡片高度
+    const minGap = 20 // 最小间距
+    
+    pillarSpheres.forEach((sphere) => {
+      // 获取小球的世界坐标
+      const worldPos = new THREE.Vector3()
+      sphere.getWorldPosition(worldPos)
       
-      pillarSpheres.forEach((sphere, index) => {
-        sphere.userData.expanded = isFocused
-        
-        if (isFocused) {
-          // 展开：小球飞出到右侧垂直排列
-          const targetX = 2
-          const targetY = 0.5 + index * 0.8
-          const targetZ = 0
-          
-          // 使用简单过渡（未来可用GSAP优化）
-          sphere.position.x = targetX
-          sphere.position.y = targetY
-          sphere.position.z = targetZ
-        } else {
-          // 归位
-          sphere.position.x = 0
-          sphere.position.y = sphere.userData.originalY
-          sphere.position.z = 0
-        }
+      // 投影到屏幕坐标
+      const screenPos = worldPos.clone()
+      screenPos.project(camera)
+      
+      const rect = container.getBoundingClientRect()
+      const x = (screenPos.x * 0.5 + 0.5) * rect.width + rect.left
+      let y = (-screenPos.y * 0.5 + 0.5) * rect.height + rect.top
+      
+      cards.push({
+        id: sphere.userData.particleData.id,
+        label: sphere.userData.particleData.label,
+        description: sphere.userData.particleData.description,
+        x: x + 40,
+        y: y - 30,
+        visible: true,
+        status: sphere.userData.particleData.status,
+        coachNote: sphere.userData.particleData.coachNote,
+        nextMoves: sphere.userData.particleData.nextMoves,
       })
     })
+    
+    // ============ 碰撞检测与自适应调整（只往上推）============
+    // 从下往上检查，如果卡片重叠则向上推
+    for (let i = cards.length - 2; i >= 0; i--) {
+      const currentCard = cards[i]
+      const nextCard = cards[i + 1]
+      
+      const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
+      
+      if (overlap > 0) {
+        // 向上推当前卡片
+        currentCard.y = nextCard.y - cardHeight - minGap
+      }
+    }
+    
+    setInfoCards(cards)
+    
+    // 动画循环更新卡片位置
+    const updateCardPositions = () => {
+      if (!focusedPillar || !cameraRef.current || !containerRef.current) return
+      
+      const updatedCards: InfoCard[] = []
+      const cardHeight = 80
+      const minGap = 20
+      
+      pillarSpheres.forEach((sphere) => {
+        const worldPos = new THREE.Vector3()
+        sphere.getWorldPosition(worldPos)
+        
+        const screenPos = worldPos.clone()
+        screenPos.project(cameraRef.current!)
+        
+        const rect = containerRef.current!.getBoundingClientRect()
+        const x = (screenPos.x * 0.5 + 0.5) * rect.width + rect.left
+        let y = (-screenPos.y * 0.5 + 0.5) * rect.height + rect.top
+        
+        updatedCards.push({
+          id: sphere.userData.particleData.id,
+          label: sphere.userData.particleData.label,
+          description: sphere.userData.particleData.description,
+          x: x + 40,
+          y: y - 30,
+          visible: true,
+          status: sphere.userData.particleData.status,
+          coachNote: sphere.userData.particleData.coachNote,
+          nextMoves: sphere.userData.particleData.nextMoves,
+        })
+      })
+      
+      // 碰撞检测与自适应调整（只往上推）
+      for (let i = updatedCards.length - 2; i >= 0; i--) {
+        const currentCard = updatedCards[i]
+        const nextCard = updatedCards[i + 1]
+        
+        const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
+        
+        if (overlap > 0) {
+          currentCard.y = nextCard.y - cardHeight - minGap
+        }
+      }
+      
+      setInfoCards(updatedCards)
+    }
+    
+    // 每帧更新位置
+    const intervalId = setInterval(updateCardPositions, 50)
+    
+    return () => {
+      clearInterval(intervalId)
+    }
   }, [focusedPillar])
   
   return (
@@ -541,6 +750,70 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
           <div className="text-sm text-gray-300 mt-1">{tooltip.subtitle}</div>
         </div>
       )}
+      
+      {/* 3D信息卡片 */}
+      {infoCards.map((card, index) => (
+        <div
+          key={card.id}
+          className="fixed pointer-events-none z-40 transition-all duration-300"
+          style={{
+            left: card.x,
+            top: card.y,
+            opacity: card.visible ? 1 : 0,
+            transform: `scale(${card.visible ? 1 : 0.8})`,
+            transitionDelay: `${index * 50}ms`, // 错开动画
+          }}
+        >
+          <div className="backdrop-blur-xl bg-black/60 border border-white/20 rounded-lg px-4 py-3 shadow-2xl max-w-sm">
+            {/* 箭头指向小球 */}
+            <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-transparent border-r-white/20" />
+            
+            <div className="text-white space-y-2">
+              {/* 标题和状态徽章 */}
+              <div className="flex items-start gap-2">
+                <div className="font-semibold text-sm leading-tight flex-1">
+                  {card.label}
+                </div>
+                {card.status && (
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                    card.status === 'strength' ? 'bg-green-500/20 text-green-300 border border-green-500/40' :
+                    card.status === 'opportunity' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40' :
+                    'bg-gray-500/20 text-gray-300 border border-gray-500/40'
+                  }`}>
+                    {card.status === 'strength' && '优势'}
+                    {card.status === 'opportunity' && '机会'}
+                    {card.status === 'maintenance' && '维持'}
+                  </span>
+                )}
+              </div>
+              
+              {/* 基础描述 */}
+              <div className="text-xs text-gray-300 leading-snug line-clamp-2">
+                {card.description}
+              </div>
+              
+              {/* 个性化教练建议 */}
+              {card.coachNote && (
+                <div className="text-xs text-blue-200 leading-snug bg-blue-500/10 rounded px-2 py-1 border-l-2 border-blue-400">
+                  💡 {card.coachNote}
+                </div>
+              )}
+              
+              {/* 下一步行动 */}
+              {card.nextMoves && card.nextMoves.length > 0 && (
+                <div className="text-xs space-y-1">
+                  <div className="text-gray-400 font-medium">下一步:</div>
+                  {card.nextMoves.slice(0, 2).map((move, i) => (
+                    <div key={i} className="text-gray-300 leading-snug pl-2 border-l border-gray-600">
+                      • {move}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
       
       {/* 控制提示 */}
       <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg text-sm">
@@ -583,9 +856,9 @@ function createParticleTrail(
   
   const material = new THREE.PointsMaterial({
     color: new THREE.Color(color),
-    size: 0.08,
+    size: 0.15, // 增大粒子
     transparent: true,
-    opacity: 0.08, // 默认很淡
+    opacity: 0.2, // 默认更明显
     blending: THREE.AdditiveBlending,
     depthWrite: false,
   })

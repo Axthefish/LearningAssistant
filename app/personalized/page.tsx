@@ -11,16 +11,15 @@ import {
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
-import { PersonalizedFramework3D } from '@/components/3d/PersonalizedFramework3D'
-import { NodeDetailModal } from '@/components/NodeDetailModal'
-import { mapPersonalizedFrameworkTo3D } from '@/lib/3d-mapper'
+import { EnergyPillarSystemPro } from '@/components/3d/EnergyPillarSystemPro'
+import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parsePersonalizedFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Download, Share2, RotateCcw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { PersonalizedFramework } from '@/lib/types'
-import type { Scene3DData, Node3D } from '@/lib/3d-mapper'
+import type { EnergyPillarData } from '@/lib/3d-mapper'
 
 export default function PersonalizedFrameworkPage() {
   const router = useRouter()
@@ -32,10 +31,8 @@ export default function PersonalizedFrameworkPage() {
   const resetSession = useStore(state => state.resetSession)
   
   const [parsedFramework, setParsedFramework] = useState<PersonalizedFramework | null>(null)
-  const [scene3DData, setScene3DData] = useState<Scene3DData | null>(null)
+  const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
   const [isComplete, setIsComplete] = useState(false)
-  const [selectedNode, setSelectedNode] = useState<Node3D | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
   
   const { content, isStreaming, sendMessage } = useChat({
     onFinish: (finalContent) => {
@@ -45,9 +42,9 @@ export default function PersonalizedFrameworkPage() {
       const parsed = parsePersonalizedFramework(finalContent, framework)
       setParsedFramework(parsed)
       
-      // 转换为3D场景数据
-      const sceneData = mapPersonalizedFrameworkTo3D(parsed)
-      setScene3DData(sceneData)
+      // 转换为能量柱数据（支持个性化）
+      const pillarData = mapToEnergyPillarData(parsed)
+      setEnergyPillarData(pillarData)
       
       // 保存到store
       setPersonalizedFramework(parsed)
@@ -64,8 +61,8 @@ export default function PersonalizedFrameworkPage() {
     // 如果已有个性化框架，直接展示
     if (storedPersonalized) {
       setParsedFramework(storedPersonalized)
-      const sceneData = mapPersonalizedFrameworkTo3D(storedPersonalized)
-      setScene3DData(sceneData)
+      const pillarData = mapToEnergyPillarData(storedPersonalized)
+      setEnergyPillarData(pillarData)
       setIsComplete(true)
       return
     }
@@ -103,10 +100,6 @@ export default function PersonalizedFrameworkPage() {
     }
   }
   
-  const handleNodeClick = (node: Node3D) => {
-    setSelectedNode(node)
-    setModalOpen(true)
-  }
   
   return (
     <div className="h-screen flex flex-col bg-background">
@@ -185,7 +178,7 @@ export default function PersonalizedFrameworkPage() {
           
           {/* Right: 3D Visualization */}
           <div className="relative bg-muted/20">
-            {!scene3DData ? (
+            {!energyPillarData ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto" />
@@ -201,9 +194,8 @@ export default function PersonalizedFrameworkPage() {
                 transition={{ duration: 0.8 }}
                 className="h-full"
               >
-                <PersonalizedFramework3D
-                  data={scene3DData}
-                  onNodeClick={handleNodeClick}
+                <EnergyPillarSystemPro
+                  data={energyPillarData}
                 />
                 
                 {/* Legend */}
@@ -227,13 +219,6 @@ export default function PersonalizedFrameworkPage() {
           </div>
         </div>
       </div>
-      
-      {/* Node Detail Modal */}
-      <NodeDetailModal
-        node={selectedNode}
-        open={modalOpen}
-        onOpenChange={setModalOpen}
-      />
     </div>
   )
 }
