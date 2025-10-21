@@ -121,31 +121,6 @@ export default function UniversalFrameworkPage() {
                 </motion.div>
               )}
               
-              {showConfirmation && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="sticky bottom-0 bg-background/95 backdrop-blur p-4 border-t lg:hidden"
-                >
-                  <Card className="p-4 space-y-4">
-                    <p className="font-medium">
-                      是否需要为你生成个性化的行动建议？
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      通过几个简短的问题，我们可以识别你的优势和机会区域，
-                      为你定制最适合的行动路径。
-                    </p>
-                    <Button
-                      onClick={handleConfirmPersonalization}
-                      className="w-full"
-                      size="lg"
-                    >
-                      是的，开始个性化分析
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
           
@@ -169,6 +144,7 @@ export default function UniversalFrameworkPage() {
               >
                 <EnergyPillarSystemPro
                   data={energyPillarData}
+                  showSidebar={true}
                 />
               </motion.div>
             )}

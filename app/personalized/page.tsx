@@ -196,6 +196,7 @@ export default function PersonalizedFrameworkPage() {
               >
                 <EnergyPillarSystemPro
                   data={energyPillarData}
+                  showSidebar={true}
                 />
                 
                 {/* Legend */}

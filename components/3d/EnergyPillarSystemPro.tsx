@@ -18,6 +18,7 @@ import type { EnergyPillarData, EnergyPillar } from '@/lib/3d-mapper'
 interface Props {
   data: EnergyPillarData
   onPillarClick?: (pillar: EnergyPillar) => void
+  showSidebar?: boolean
 }
 
 interface TooltipState {
@@ -51,7 +52,7 @@ interface ParticleTrail {
   speed: number
 }
 
-export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
+export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
@@ -73,6 +74,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
     subtitle: '',
   })
   const [infoCards, setInfoCards] = useState<InfoCard[]>([])
+  const [sidebarOpen, setSidebarOpen] = useState(showSidebar)
   
   // ============ 主场景初始化 ============
   useEffect(() => {
@@ -193,12 +195,28 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
     camera.lookAt(0, 2, 0)
     cameraRef.current = camera
     
-    // 渲染器
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    // 渲染器（加强错误处理）
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      preserveDrawingBuffer: true, // 防止context丢失
+      powerPreference: 'high-performance',
+    })
     renderer.setSize(container.clientWidth, container.clientHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.2
+    
+    // WebGL context丢失恢复
+    renderer.domElement.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault()
+      console.warn('⚠️ WebGL context lost, attempting recovery...')
+    })
+    
+    renderer.domElement.addEventListener('webglcontextrestored', () => {
+      console.log('✅ WebGL context restored')
+    })
+    
     container.appendChild(renderer.domElement)
     rendererRef.current = renderer
     
@@ -633,8 +651,13 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
     
     // 计算每个小球的3D位置并投影到2D屏幕坐标
     const cards: InfoCard[] = []
-    const cardHeight = 80 // 估算的卡片高度
-    const minGap = 20 // 最小间距
+    
+    // 简化卡片：只显示标题，固定高度
+    const getCardHeight = () => {
+      return 40 // 固定高度，只显示标题
+    }
+    
+    const minGap = 15 // 最小间距
     
     pillarSpheres.forEach((sphere) => {
       // 获取小球的世界坐标
@@ -662,17 +685,37 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
       })
     })
     
-    // ============ 碰撞检测与自适应调整（只往上推）============
-    // 从下往上检查，如果卡片重叠则向上推
-    for (let i = cards.length - 2; i >= 0; i--) {
-      const currentCard = cards[i]
-      const nextCard = cards[i + 1]
+    // ============ 智能自适应布局（确保全部可见）============
+    const rect = container.getBoundingClientRect()
+    const availableHeight = rect.height
+    const topMargin = 80 // 顶部留白
+    const bottomMargin = 80 // 底部留白
+    const usableHeight = availableHeight - topMargin - bottomMargin
+    
+    // 计算总高度需求
+    const cardHeight = getCardHeight()
+    const totalNeededHeight = cards.length * cardHeight + (cards.length - 1) * minGap
+    
+    if (totalNeededHeight > usableHeight) {
+      // 卡片太多，采用紧凑布局
+      const compressedGap = Math.max(3, (usableHeight - cards.length * cardHeight) / (cards.length - 1))
       
-      const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
-      
-      if (overlap > 0) {
-        // 向上推当前卡片
-        currentCard.y = nextCard.y - cardHeight - minGap
+      let currentY = availableHeight - bottomMargin
+      for (let i = cards.length - 1; i >= 0; i--) {
+        cards[i].y = currentY
+        currentY -= cardHeight + compressedGap
+      }
+    } else {
+      // 空间充足，正常间距
+      for (let i = cards.length - 2; i >= 0; i--) {
+        const currentCard = cards[i]
+        const nextCard = cards[i + 1]
+        
+        const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
+        
+        if (overlap > 0) {
+          currentCard.y = nextCard.y - cardHeight - minGap
+        }
       }
     }
     
@@ -683,8 +726,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
       if (!focusedPillar || !cameraRef.current || !containerRef.current) return
       
       const updatedCards: InfoCard[] = []
-      const cardHeight = 80
-      const minGap = 20
+      const minGap = 15
       
       pillarSpheres.forEach((sphere) => {
         const worldPos = new THREE.Vector3()
@@ -710,15 +752,34 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
         })
       })
       
-      // 碰撞检测与自适应调整（只往上推）
-      for (let i = updatedCards.length - 2; i >= 0; i--) {
-        const currentCard = updatedCards[i]
-        const nextCard = updatedCards[i + 1]
+      // 智能自适应布局（简化版）
+      const rect = containerRef.current!.getBoundingClientRect()
+      const availableHeight = rect.height
+      const topMargin = 80
+      const bottomMargin = 80
+      const usableHeight = availableHeight - topMargin - bottomMargin
+      
+      const cardHeight = getCardHeight()
+      const totalNeededHeight = updatedCards.length * cardHeight + (updatedCards.length - 1) * minGap
+      
+      if (totalNeededHeight > usableHeight) {
+        const compressedGap = Math.max(3, (usableHeight - updatedCards.length * cardHeight) / (updatedCards.length - 1))
         
-        const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
-        
-        if (overlap > 0) {
-          currentCard.y = nextCard.y - cardHeight - minGap
+        let currentY = availableHeight - bottomMargin
+        for (let i = updatedCards.length - 1; i >= 0; i--) {
+          updatedCards[i].y = currentY
+          currentY -= cardHeight + compressedGap
+        }
+      } else {
+        for (let i = updatedCards.length - 2; i >= 0; i--) {
+          const currentCard = updatedCards[i]
+          const nextCard = updatedCards[i + 1]
+          
+          const overlap = (currentCard.y + cardHeight + minGap) - nextCard.y
+          
+          if (overlap > 0) {
+            currentCard.y = nextCard.y - cardHeight - minGap
+          }
         }
       }
       
@@ -764,59 +825,33 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
             transitionDelay: `${index * 50}ms`, // 错开动画
           }}
         >
-          <div className="backdrop-blur-xl bg-black/60 border border-white/20 rounded-lg px-4 py-3 shadow-2xl max-w-sm">
+          <div className="backdrop-blur-xl bg-black/70 border border-white/20 rounded-lg px-3 py-2 shadow-2xl max-w-xs">
             {/* 箭头指向小球 */}
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-b-[6px] border-r-[8px] border-transparent border-r-white/20" />
             
-            <div className="text-white space-y-2">
-              {/* 标题和状态徽章 */}
-              <div className="flex items-start gap-2">
-                <div className="font-semibold text-sm leading-tight flex-1">
-                  {card.label}
-                </div>
-                {card.status && (
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
-                    card.status === 'strength' ? 'bg-green-500/20 text-green-300 border border-green-500/40' :
-                    card.status === 'opportunity' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40' :
-                    'bg-gray-500/20 text-gray-300 border border-gray-500/40'
-                  }`}>
-                    {card.status === 'strength' && '优势'}
-                    {card.status === 'opportunity' && '机会'}
-                    {card.status === 'maintenance' && '维持'}
-                  </span>
-                )}
+            {/* 简化卡片：只显示标题+状态 */}
+            <div className="flex items-center gap-2 text-white">
+              <div className="font-medium text-xs leading-tight flex-1 truncate">
+                {card.label}
               </div>
-              
-              {/* 基础描述 */}
-              <div className="text-xs text-gray-300 leading-snug line-clamp-2">
-                {card.description}
-              </div>
-              
-              {/* 个性化教练建议 */}
-              {card.coachNote && (
-                <div className="text-xs text-blue-200 leading-snug bg-blue-500/10 rounded px-2 py-1 border-l-2 border-blue-400">
-                  💡 {card.coachNote}
-                </div>
-              )}
-              
-              {/* 下一步行动 */}
-              {card.nextMoves && card.nextMoves.length > 0 && (
-                <div className="text-xs space-y-1">
-                  <div className="text-gray-400 font-medium">下一步:</div>
-                  {card.nextMoves.slice(0, 2).map((move, i) => (
-                    <div key={i} className="text-gray-300 leading-snug pl-2 border-l border-gray-600">
-                      • {move}
-                    </div>
-                  ))}
-                </div>
+              {card.status && (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium whitespace-nowrap flex-shrink-0 ${
+                  card.status === 'strength' ? 'bg-green-500/30 text-green-200' :
+                  card.status === 'opportunity' ? 'bg-orange-500/30 text-orange-200' :
+                  'bg-gray-500/30 text-gray-200'
+                }`}>
+                  {card.status === 'strength' && '✓'}
+                  {card.status === 'opportunity' && '⚡'}
+                  {card.status === 'maintenance' && '●'}
+                </span>
               )}
             </div>
           </div>
         </div>
       ))}
       
-      {/* 控制提示 */}
-      <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg text-sm">
+      {/* 控制提示（高z-index确保可见）*/}
+      <div className="absolute top-4 right-4 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-50 backdrop-blur-sm border border-white/10">
         <p className="font-medium mb-1">💡 交互提示</p>
         <ul className="space-y-1 text-xs">
           <li>• 拖拽旋转视角</li>
@@ -824,6 +859,141 @@ export function EnergyPillarSystemPro({ data, onPillarClick }: Props) {
           <li>• 点击展开详情</li>
         </ul>
       </div>
+      
+      {/* 侧边栏：模块说明 */}
+      {showSidebar && (
+        <div className={`absolute top-0 right-0 h-full bg-background/95 backdrop-blur-xl border-l transition-all duration-300 z-40 ${
+          sidebarOpen ? 'w-80' : 'w-12'
+        }`}>
+          {/* 展开/收起按钮 */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="absolute top-4 -left-10 bg-black/80 text-white p-2 rounded-l-lg hover:bg-black/90 transition-colors border border-r-0 border-white/10"
+          >
+            {sidebarOpen ? '→' : '←'}
+          </button>
+          
+          {sidebarOpen && (
+            <div className="h-full overflow-y-auto p-6 space-y-4">
+              <h3 className="font-semibold text-lg mb-4">系统概览</h3>
+              
+              <div className="text-sm text-muted-foreground mb-6">
+                {data.metadata.systemGoal}
+              </div>
+              
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">核心模块</h4>
+                {data.pillars.map((pillar) => (
+                  <button
+                    key={pillar.id}
+                    onClick={() => {
+                      const pillarGroup = pillarsRef.current.get(pillar.id)
+                      if (pillarGroup && onPillarClick) {
+                        onPillarClick(pillarGroup.userData.pillarData)
+                      }
+                      setFocusedPillar(focusedPillar === pillar.id ? null : pillar.id)
+                    }}
+                    className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                      focusedPillar === pillar.id
+                        ? 'border-primary bg-primary/10'
+                        : 'border-transparent bg-muted/50 hover:bg-muted'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: pillar.color }}
+                      />
+                      <span className="font-medium text-sm">{pillar.moduleName}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {pillar.coreIdea}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              
+              {/* 选中模块的详细信息 */}
+              {focusedPillar && (
+                <div className="space-y-3 pt-4 border-t">
+                  <h4 className="font-medium text-sm">关键行动详情</h4>
+                  {data.pillars.find(p => p.id === focusedPillar)?.particles.map((particle) => (
+                    <div key={particle.id} className="p-3 rounded-lg bg-muted/50 space-y-2">
+                      <div className="flex items-start gap-2">
+                        <div className="font-medium text-sm flex-1">{particle.label}</div>
+                        {particle.status && (
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap ${
+                            particle.status === 'strength' ? 'bg-green-500/20 text-green-600 border border-green-500/40' :
+                            particle.status === 'opportunity' ? 'bg-orange-500/20 text-orange-600 border border-orange-500/40' :
+                            'bg-gray-500/20 text-gray-600 border border-gray-500/40'
+                          }`}>
+                            {particle.status === 'strength' && '优势'}
+                            {particle.status === 'opportunity' && '机会'}
+                            {particle.status === 'maintenance' && '维持'}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {particle.description}
+                      </p>
+                      
+                      {particle.coachNote && (
+                        <div className="text-xs text-blue-600 dark:text-blue-400 leading-snug bg-blue-500/10 rounded px-2 py-1.5 border-l-2 border-blue-500">
+                          <div className="font-medium mb-0.5">💡 个性化建议</div>
+                          {particle.coachNote}
+                        </div>
+                      )}
+                      
+                      {particle.nextMoves && particle.nextMoves.length > 0 && (
+                        <div className="text-xs space-y-1">
+                          <div className="font-medium text-muted-foreground">下一步行动:</div>
+                          {particle.nextMoves.map((move, i) => (
+                            <div key={i} className="text-muted-foreground leading-snug pl-2 border-l-2 border-muted">
+                              • {move}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* 动态关系 */}
+              <div className="space-y-3 pt-4 border-t">
+                <h4 className="font-medium text-sm">系统动态</h4>
+                {data.connections.map((conn, index) => {
+                  const fromPillar = data.pillars.find(p => p.id === conn.from)
+                  const toPillar = data.pillars.find(p => p.id === conn.to)
+                  
+                  return (
+                    <div key={index} className="p-3 rounded-lg bg-muted/50 text-xs">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`px-2 py-0.5 rounded-full font-medium text-[10px] ${
+                          conn.type === 'synergy' ? 'bg-green-500/20 text-green-600' :
+                          conn.type === 'tradeoff' ? 'bg-orange-500/20 text-orange-600' :
+                          conn.type === 'dependency' ? 'bg-purple-500/20 text-purple-600' :
+                          'bg-pink-500/20 text-pink-600'
+                        }`}>
+                          {conn.type === 'synergy' && '协同'}
+                          {conn.type === 'tradeoff' && '权衡'}
+                          {conn.type === 'dependency' && '依赖'}
+                          {conn.type === 'feedback' && '反馈'}
+                        </span>
+                        <span className="font-medium">{conn.label}</span>
+                      </div>
+                      <div className="text-muted-foreground">
+                        {fromPillar?.moduleName} → {toPillar?.moduleName}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
