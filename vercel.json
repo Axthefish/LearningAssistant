@@ -3,12 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["sin1"],
-  "functions": {
-    "app/api/chat/route.ts": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 60
-    }
-  }
+  "regions": ["sin1"]
 }
 
