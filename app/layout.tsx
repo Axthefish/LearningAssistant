@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { StoreInitializer } from "@/components/StoreInitializer"
 import { GlobalNav } from "@/components/GlobalNav"
@@ -9,11 +8,9 @@ import { Toaster } from "@/components/ui/toaster"
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
-const inter = Inter({ subsets: ["latin"] })
-
 export const metadata: Metadata = {
   title: "Learning Assistant",
-  description: "将模糊需求转化为个性化行动蓝图",
+  description: "将想法，变为行动",
 }
 
 export default function RootLayout({
@@ -23,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body>
         <ErrorBoundary>
           <ThemeProvider
             attribute="class"

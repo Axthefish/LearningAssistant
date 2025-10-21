@@ -86,9 +86,9 @@ export default function UniversalFrameworkPage() {
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">通用行动框架</h1>
-              <p className="text-sm text-muted-foreground">
-                步骤 3/7
+              <h1 className="text-apple-h1">你的成长蓝图</h1>
+              <p className="text-apple-caption text-muted-foreground">
+                基于你的目标，我们为你梳理了清晰的行动路径
               </p>
             </div>
             {showConfirmation && (
@@ -100,12 +100,12 @@ export default function UniversalFrameworkPage() {
                 {isNavigating ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    处理中...
+                    准备中...
                   </>
                 ) : (
                   <>
-                    生成个性化方案
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    为我定制
+                    <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
               </Button>
@@ -122,7 +122,7 @@ export default function UniversalFrameworkPage() {
             <div className="max-w-2xl mx-auto space-y-6">
               <ThinkingProcess
                 isThinking={isStreaming}
-                thinkingText="正在构建通用框架，分析核心模块和系统动态..."
+                thinkingText="正在为你思考..."
               />
               
               {(content || markdownContent) && (
@@ -147,9 +147,9 @@ export default function UniversalFrameworkPage() {
             {!energyPillarData ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center space-y-4">
-                  <Box className="w-16 h-16 mx-auto text-muted-foreground animate-pulse" />
-                  <p className="text-muted-foreground">
-                    等待框架生成中...
+                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-muted border-t-primary mx-auto" />
+                  <p className="text-apple-body text-muted-foreground mt-4">
+                    正在为你梳理...
                   </p>
                 </div>
               </div>

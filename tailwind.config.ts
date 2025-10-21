@@ -54,9 +54,28 @@ const config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
+        lg: "var(--radius-lg)",
+        md: "var(--radius)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "var(--radius-xl)",
+      },
+      boxShadow: {
+        'apple-sm': 'var(--shadow-sm)',
+        'apple-md': 'var(--shadow-md)',
+        'apple-lg': 'var(--shadow-lg)',
+        'apple-card': 'var(--shadow-card)',
+      },
+      fontSize: {
+        'apple-hero': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'apple-h1': ['2.25rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'apple-h2': ['1.75rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'apple-h3': ['1.375rem', { lineHeight: '1.3', fontWeight: '600' }],
+        'apple-body': ['1.0625rem', { lineHeight: '1.47' }],
+        'apple-caption': ['0.8125rem', { lineHeight: '1.4' }],
+      },
+      transitionTimingFunction: {
+        'apple-spring': 'cubic-bezier(0.36, 0.66, 0.04, 1)',
+        'apple-smooth': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
       },
       keyframes: {
         "accordion-down": {
