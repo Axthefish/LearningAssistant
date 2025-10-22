@@ -198,23 +198,6 @@ export default function PersonalizedFrameworkPage() {
                   data={energyPillarData}
                   showSidebar={true}
                 />
-                
-                {/* Legend */}
-                <div className="absolute bottom-4 left-4 bg-black/70 text-white p-4 rounded-lg text-sm space-y-2">
-                  <p className="font-medium mb-2">图例</p>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="text-xs">🟢 优势区域</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-500" />
-                    <span className="text-xs">🟠 机会区域</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-400" />
-                    <span className="text-xs">🟡 维护区域</span>
-                  </div>
-                </div>
               </motion.div>
             )}
           </div>

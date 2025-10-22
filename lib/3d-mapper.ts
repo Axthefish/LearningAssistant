@@ -297,19 +297,36 @@ export function mapToEnergyPillarData(
   const pillars: EnergyPillar[] = []
   const connections: EnergyConnection[] = []
   
-  // 定义4个柱子的颜色和位置
-  const pillarColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
-  const pillarPositions: [number, number, number][] = [
-    [-6, 0, 0],  // 左1
-    [-2, 0, 0],  // 左2
-    [2, 0, 0],   // 右1
-    [6, 0, 0],   // 右2
-  ]
+  // 柱子颜色（循环使用）
+  const pillarColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6']
+  
+  // 动态计算柱子位置（支持2-6个模块）
+  const moduleCount = framework.modules.length
+  const pillarPositions: [number, number, number][] = []
+  
+  if (moduleCount === 2) {
+    pillarPositions.push([-3, 0, 0], [3, 0, 0])
+  } else if (moduleCount === 3) {
+    pillarPositions.push([-4, 0, 0], [0, 0, 0], [4, 0, 0])
+  } else if (moduleCount === 4) {
+    pillarPositions.push([-6, 0, 0], [-2, 0, 0], [2, 0, 0], [6, 0, 0])
+  } else if (moduleCount === 5) {
+    pillarPositions.push([-8, 0, 0], [-4, 0, 0], [0, 0, 0], [4, 0, 0], [8, 0, 0])
+  } else if (moduleCount === 6) {
+    pillarPositions.push([-10, 0, 0], [-6, 0, 0], [-2, 0, 0], [2, 0, 0], [6, 0, 0], [10, 0, 0])
+  } else {
+    // 默认使用4柱布局
+    for (let i = 0; i < moduleCount; i++) {
+      const spacing = 4
+      const offset = -(moduleCount - 1) * spacing / 2
+      pillarPositions.push([offset + i * spacing, 0, 0])
+    }
+  }
   
   // 创建柱子（每个模块对应一根柱子）
   framework.modules.forEach((module, moduleIndex) => {
-    const color = pillarColors[moduleIndex % 4]
-    const position = pillarPositions[moduleIndex % 4]
+    const color = pillarColors[moduleIndex % pillarColors.length]
+    const position = pillarPositions[moduleIndex] || [0, 0, 0]
     
     // 每个Key Action对应一个粒子
     const particles: EnergyPillarParticle[] = module.keyActions.map((action, actionIndex) => {

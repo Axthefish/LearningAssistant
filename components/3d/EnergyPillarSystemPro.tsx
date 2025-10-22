@@ -75,6 +75,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
   })
   const [infoCards, setInfoCards] = useState<InfoCard[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(showSidebar)
+  const [tipsOpen, setTipsOpen] = useState(true)
   
   // ============ 主场景初始化 ============
   useEffect(() => {
@@ -850,15 +851,33 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
         </div>
       ))}
       
-      {/* 控制提示（高z-index确保可见）*/}
-      <div className="absolute top-4 right-4 bg-black/80 text-white px-4 py-2 rounded-lg text-sm z-50 backdrop-blur-sm border border-white/10">
-        <p className="font-medium mb-1">💡 交互提示</p>
-        <ul className="space-y-1 text-xs">
-          <li>• 拖拽旋转视角</li>
-          <li>• 悬停查看模块</li>
-          <li>• 点击展开详情</li>
-        </ul>
-      </div>
+      {/* 交互提示 - 左上角可收起 */}
+      {tipsOpen ? (
+        <div className="absolute top-4 left-4 bg-black/80 text-white px-4 py-3 rounded-xl text-sm z-50 backdrop-blur-sm border border-white/10 shadow-apple-lg">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-semibold">💡 交互提示</p>
+            <button
+              onClick={() => setTipsOpen(false)}
+              className="text-white/60 hover:text-white transition-colors ml-4"
+            >
+              ✕
+            </button>
+          </div>
+          <ul className="space-y-1 text-xs text-white/80">
+            <li>• 拖拽旋转视角</li>
+            <li>• 悬停查看模块</li>
+            <li>• 点击展开详情</li>
+          </ul>
+        </div>
+      ) : (
+        <button
+          onClick={() => setTipsOpen(true)}
+          className="absolute top-4 left-4 bg-black/80 text-white p-3 rounded-xl z-50 backdrop-blur-sm border border-white/10 hover:bg-black/90 transition-all shadow-apple-md"
+          title="显示交互提示"
+        >
+          💡
+        </button>
+      )}
       
       {/* 侧边栏：模块说明 */}
       {showSidebar && (

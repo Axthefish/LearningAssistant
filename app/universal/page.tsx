@@ -11,8 +11,9 @@ import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parseUniversalFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ArrowRight, Box } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { UniversalFramework } from '@/lib/types'
 import type { EnergyPillarData } from '@/lib/3d-mapper'
 
@@ -114,60 +115,69 @@ export default function UniversalFrameworkPage() {
         </div>
       </div>
       
-      {/* Main Content */}
+      {/* Main Content - 可调整大小的面板 */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-0">
+        <PanelGroup direction="horizontal" className="h-full">
           {/* Left: Markdown Content */}
-          <div className="overflow-y-auto p-6 border-r">
-            <div className="max-w-2xl mx-auto space-y-6">
-              <ThinkingProcess
-                isThinking={isStreaming}
-                thinkingText="正在为你思考..."
-              />
-              
-              {(content || markdownContent) && (
+          <Panel defaultSize={50} minSize={30} maxSize={70}>
+            <div className="h-full overflow-y-auto p-6 scrollbar-thin">
+              <div className="max-w-2xl mx-auto space-y-6">
+                <ThinkingProcess
+                  isThinking={isStreaming}
+                  thinkingText="正在为你思考..."
+                />
+                
+                {(content || markdownContent) && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <Card className="p-6">
+                      <StreamingMessage
+                        content={content || markdownContent}
+                        isStreaming={isStreaming}
+                      />
+                    </Card>
+                  </motion.div>
+                )}
+                
+              </div>
+            </div>
+          </Panel>
+          
+          {/* 可拖拽的分隔条 */}
+          <PanelResizeHandle className="w-1 bg-border/50 hover:bg-primary/50 transition-colors relative group">
+            <div className="absolute inset-y-0 -inset-x-1 group-hover:bg-primary/10 transition-colors" />
+          </PanelResizeHandle>
+          
+          {/* Right: 3D Visualization */}
+          <Panel defaultSize={50} minSize={30} maxSize={70}>
+            <div className="relative bg-muted/20 h-full">
+              {!energyPillarData ? (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center space-y-4">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-muted border-t-primary mx-auto" />
+                    <p className="text-apple-body text-muted-foreground mt-4">
+                      正在为你梳理...
+                    </p>
+                  </div>
+                </div>
+              ) : (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="h-full"
                 >
-                  <Card className="p-6">
-                    <StreamingMessage
-                      content={content || markdownContent}
-                      isStreaming={isStreaming}
-                    />
-                  </Card>
+                  <EnergyPillarSystemPro
+                    data={energyPillarData}
+                    showSidebar={true}
+                  />
                 </motion.div>
               )}
-              
             </div>
-          </div>
-          
-          {/* Right: 3D Visualization */}
-          <div className="relative bg-muted/20">
-            {!energyPillarData ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-muted border-t-primary mx-auto" />
-                  <p className="text-apple-body text-muted-foreground mt-4">
-                    正在为你梳理...
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="h-full"
-              >
-                <EnergyPillarSystemPro
-                  data={energyPillarData}
-                  showSidebar={true}
-                />
-              </motion.div>
-            )}
-          </div>
-        </div>
+          </Panel>
+        </PanelGroup>
       </div>
     </div>
   )

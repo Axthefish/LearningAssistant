@@ -143,19 +143,38 @@ export default function DiagnosisPage() {
           </p>
         </div>
         
-        {/* Generating Questions */}
+        {/* Generating Questions - Apple风格骨架屏 */}
         {isGeneratingQuestions && (
           <>
-            <ThinkingProcess
-              isThinking={isStreaming}
-              thinkingText="正在分析框架，识别高杠杆诊断点..."
-            />
-            <Card className="p-6">
-              <StreamingMessage
-                content={content}
-                isStreaming={isStreaming}
-              />
-            </Card>
+            <div className="flex items-center gap-3 text-muted-foreground">
+              <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <span className="text-apple-body">正在为你准备问题...</span>
+            </div>
+            
+            {/* 骨架屏预览 */}
+            <div className="space-y-4 animate-pulse">
+              <Card className="p-8 space-y-4 border-0 bg-muted/20">
+                <div className="h-8 bg-muted/50 rounded-xl w-2/3" />
+                <div className="h-4 bg-muted/40 rounded-lg w-full" />
+                <div className="h-4 bg-muted/40 rounded-lg w-5/6" />
+                <div className="h-32 bg-muted/30 rounded-xl mt-6" />
+              </Card>
+              
+              <Card className="p-8 space-y-4 border-0 bg-muted/20">
+                <div className="h-8 bg-muted/50 rounded-xl w-1/2" />
+                <div className="h-4 bg-muted/40 rounded-lg w-full" />
+                <div className="h-32 bg-muted/30 rounded-xl mt-6" />
+              </Card>
+            </div>
+            
+            {content && (
+              <Card className="p-6">
+                <StreamingMessage
+                  content={content}
+                  isStreaming={isStreaming}
+                />
+              </Card>
+            )}
           </>
         )}
         
