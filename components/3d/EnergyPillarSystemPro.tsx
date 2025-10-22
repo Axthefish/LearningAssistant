@@ -394,13 +394,18 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     let previousMouse = { x: 0, y: 0 }
     let cameraRotation = { theta: 0, phi: Math.PI / 6 }
     
-    // 根据模块数量动态调整相机距离
+    // 根据模块数量动态调整相机距离（基于prompt常见输出：3-5个模块）
     const pillarCount = data.pillars.length
-    let cameraDistance = 16 // 默认
-    if (pillarCount <= 3) {
-      cameraDistance = 12 // 近距离
-    } else if (pillarCount >= 5) {
-      cameraDistance = 20 // 远距离
+    let cameraDistance = 16 // 默认（4个模块）
+    
+    if (pillarCount === 3) {
+      cameraDistance = 14 // 稍近
+    } else if (pillarCount === 5) {
+      cameraDistance = 18 // 稍远
+    } else if (pillarCount >= 6) {
+      cameraDistance = 22 // 很远（罕见情况）
+    } else if (pillarCount === 2) {
+      cameraDistance = 12 // 很近（罕见）
     }
     
     const onMouseDown = (e: MouseEvent) => {
