@@ -142,18 +142,6 @@ export default function HomePage() {
             </div>
           </div>
           
-          <div className="text-center pt-4 border-t">
-            <p className="text-sm text-muted-foreground mb-3">
-              还没想清楚要做什么？
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => alert('领域探索功能开发中...')}
-              className="rounded-xl"
-            >
-              探索一个新领域
-            </Button>
-          </div>
         </motion.div>
       </motion.div>
     </div>

@@ -393,7 +393,15 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     let isDragging = false
     let previousMouse = { x: 0, y: 0 }
     let cameraRotation = { theta: 0, phi: Math.PI / 6 }
-    const cameraDistance = 16
+    
+    // 根据模块数量动态调整相机距离
+    const pillarCount = data.pillars.length
+    let cameraDistance = 16 // 默认
+    if (pillarCount <= 3) {
+      cameraDistance = 12 // 近距离
+    } else if (pillarCount >= 5) {
+      cameraDistance = 20 // 远距离
+    }
     
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true
@@ -479,7 +487,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     
     animate()
     
-    // 响应式
+    // 响应式 - 监听容器大小变化（支持Panel调整）
     const handleResize = () => {
       if (!container) return
       camera.aspect = container.clientWidth / container.clientHeight
@@ -487,11 +495,16 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
       renderer.setSize(container.clientWidth, container.clientHeight)
     }
     
+    // ResizeObserver监听容器大小
+    const resizeObserver = new ResizeObserver(handleResize)
+    resizeObserver.observe(container)
+    
     window.addEventListener('resize', handleResize)
     
     // 清理
     return () => {
       cancelAnimationFrame(animationFrameRef.current)
+      resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
       container?.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mousemove', onMouseMoveCamera)

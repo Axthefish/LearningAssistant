@@ -16,7 +16,7 @@ import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parsePersonalizedFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Download, Share2, RotateCcw } from 'lucide-react'
+import { Download, RotateCcw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { PersonalizedFramework } from '@/lib/types'
 import type { EnergyPillarData } from '@/lib/3d-mapper'
@@ -119,10 +119,6 @@ export default function PersonalizedFrameworkPage() {
                   <Download className="w-4 h-4 mr-2" />
                   导出
                 </Button>
-                <Button variant="outline">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  分享
-                </Button>
                 <Button onClick={handleStartNew}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   开始新会话
@@ -158,21 +154,6 @@ export default function PersonalizedFrameworkPage() {
                 </motion.div>
               )}
               
-              {isComplete && parsedFramework && parsedFramework.firstStep && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="sticky bottom-0 bg-background/95 backdrop-blur p-4 border-t"
-                >
-                  <Card className="p-6 space-y-4 bg-primary/5 border-primary/20">
-                    <h3 className="text-xl font-bold">🎯 你的下一步</h3>
-                    <p className="text-lg">{parsedFramework.firstStep}</p>
-                    <Button size="lg" className="w-full">
-                      立即开始
-                    </Button>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
           

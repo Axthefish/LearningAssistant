@@ -147,7 +147,16 @@ export default function UniversalFrameworkPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <Card className="p-6">
+                    <Card className="p-6 relative">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(content || markdownContent)
+                          alert('已复制到剪贴板')
+                        }}
+                        className="absolute top-4 right-4 px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                      >
+                        复制
+                      </button>
                       <StreamingMessage
                         content={content || markdownContent}
                         isStreaming={isStreaming}
