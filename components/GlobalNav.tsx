@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Menu, History, Home, Moon, Sun } from 'lucide-react'
+import { Menu, History, Home, Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SessionHistory } from './SessionHistory'
 import { useState } from 'react'
@@ -26,6 +26,20 @@ export function GlobalNav() {
   const { theme, setTheme } = useTheme()
   
   const [showHistory, setShowHistory] = useState(false)
+  const [currentLocale, setCurrentLocale] = useState<string>('en')
+  
+  // 语言切换
+  const handleLanguageChange = (locale: string) => {
+    setCurrentLocale(locale)
+    localStorage.setItem('preferredLanguage', locale)
+    window.location.reload() // 简单粗暴但有效
+  }
+  
+  // 初始化语言
+  useState(() => {
+    const saved = localStorage.getItem('preferredLanguage') || 'en'
+    setCurrentLocale(saved)
+  })
   
   const handleGoHome = async () => {
     if (currentStep > 1) {
@@ -82,6 +96,27 @@ export function GlobalNav() {
                 <Moon className="w-5 h-5" />
               )}
             </Button>
+            
+            {/* 语言切换器 */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" title="Language">
+                  <Globe className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                  <span className={currentLocale === 'en' ? 'font-semibold' : ''}>
+                    English
+                  </span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange('zh')}>
+                  <span className={currentLocale === 'zh' ? 'font-semibold' : ''}>
+                    简体中文
+                  </span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

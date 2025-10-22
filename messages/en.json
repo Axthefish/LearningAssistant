@@ -1,0 +1,77 @@
+{
+  "common": {
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "edit": "Edit",
+    "save": "Save",
+    "copy": "Copy",
+    "copied": "Copied to clipboard",
+    "loading": "Loading...",
+    "thinking": "Thinking for you...",
+    "organizing": "Organizing for you..."
+  },
+  "nav": {
+    "home": "Home",
+    "history": "Previous Conversations",
+    "newSession": "Start New Exploration",
+    "theme": "Toggle Theme"
+  },
+  "homepage": {
+    "title": "Facing a new challenge, not sure where to start?",
+    "subtitle": "I'll help you: <highlight>See the big picture</highlight> → <highlight>Find the focus</highlight> → <highlight>Clarify the first step</highlight>",
+    "inputPlaceholder": "Tell me your confusion or goal\nCan be informal, scattered...",
+    "startButton": "Start Organizing",
+    "loadingButton": "Organizing...",
+    "scenariosTitle": "Common Scenarios",
+    "scenarios": {
+      "career": "Boost workplace influence",
+      "team": "Better team management",
+      "learning": "Learn AI systematically",
+      "balance": "Work-life balance"
+    }
+  },
+  "initial": {
+    "title": "Clarify Your Goal",
+    "subtitle": "Based on your thoughts, let's refine a clear mission together",
+    "yourThoughts": "Your Thoughts",
+    "backButton": "Back"
+  },
+  "universal": {
+    "title": "Your Growth Blueprint",
+    "subtitle": "Based on your goal, we've outlined a clear action path for you",
+    "contextTitle": "🗺️ Why Do You Need to See the Big Picture?",
+    "contextBody": "Most people tend to focus on just one point, but <strong>{systemName}</strong> is actually a system",
+    "contextPoints": {
+      "pillars": "See all pillars",
+      "interactions": "Understand interactions",
+      "balance": "Avoid trade-offs"
+    },
+    "customizeButton": "Customize for Me",
+    "preparing": "Preparing..."
+  },
+  "diagnosis": {
+    "title": "Let's Talk About Your Current Situation 💬",
+    "subtitle": "I need to ask a few questions, not to test you, but to find your unique starting point",
+    "progress": "Question {current} of {total}",
+    "preparingQuestions": "Preparing questions for you...",
+    "nextButton": "Next",
+    "previousButton": "Previous",
+    "submitButton": "Complete",
+    "answerPlaceholder": "Your answer...",
+    "noRightOrWrong": "💡 No right or wrong answers, just be honest"
+  },
+  "personalized": {
+    "title": "Your Personal Action Framework",
+    "subtitle": "Step 7/7 - Complete ✨",
+    "exportButton": "Export",
+    "newSessionButton": "Start New Session",
+    "loading": "Generating your personalized framework..."
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "timeout": "Request timeout. Please try again."
+  }
+}
+
