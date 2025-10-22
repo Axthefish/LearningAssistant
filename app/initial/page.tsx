@@ -71,29 +71,26 @@ export default function InitialExtractionPage() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" onClick={handleBack}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+        {/* Header - Apple风格简洁导航 */}
+        <div className="flex items-center">
+          <Button variant="ghost" onClick={handleBack} className="rounded-xl">
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            <span className="text-apple-body">返回</span>
           </Button>
-          <div className="text-sm text-muted-foreground">
-            步骤 2/7
-          </div>
         </div>
         
-        {/* Title */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">让我们明确你的核心目标</h1>
-          <p className="text-muted-foreground">
-            基于你的输入，我正在提炼出一个清晰、精确的使命陈述...
+        {/* Title - Apple大标题 */}
+        <div className="space-y-4 text-center">
+          <h1 className="text-apple-hero">明确你的目标</h1>
+          <p className="text-apple-h3 text-muted-foreground max-w-3xl mx-auto font-normal">
+            基于你的想法，我们一起提炼出清晰的使命
           </p>
         </div>
         
-        {/* User Input Recap */}
-        <Card className="p-4 bg-muted/30">
-          <p className="text-sm text-muted-foreground mb-2">你的原始输入：</p>
-          <p className="text-base">{userInput?.content}</p>
+        {/* User Input Recap - Apple风格卡片 */}
+        <Card className="p-8 bg-muted/20 border-0">
+          <p className="text-apple-caption text-muted-foreground mb-3 font-medium">你的想法</p>
+          <p className="text-apple-body leading-relaxed">{userInput?.content}</p>
         </Card>
         
         {/* AI Thinking */}
