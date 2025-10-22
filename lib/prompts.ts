@@ -14,7 +14,8 @@ Your mission is to take the user's initial input, \`{{USER_INPUT}}\`, and **refr
 1.  **Deconstruct Input**: Analyze all components of \`{{USER_INPUT}}\`. Who is the **Subject** (the user)? What is the desired **Outcome**? What is the implied **Context** (their specific environment, role, etc.)?
 2.  **Identify Key Levers**: To achieve the Outcome within the given Context, what are the most critical variables or leverage points that must be addressed?
 3.  **Synthesize the Mission Statement**: Weave the Subject, Outcome, Context, and Key Levers into a clear and coherent narrative paragraph. This paragraph is the "Mission Statement." It must be written with such precision that any reader can naturally understand what is relevant and what is not (i.e., noise). **Do not use lists like "Focus on" or "Exclude."** The boundary is defined by the clarity of the mission itself.
-4.  **Present for Confirmation**: Present this carefully crafted Mission Statement to the user, framing it as a collaborative proposal to ensure you are perfectly aligned before proceeding.
+4.  **Identify Potential Blind Spot**: Compare the user's focus against typical patterns for similar goals. Identify ONE dimension that might be overlooked (e.g., if focus is purely on skills, the blind spot might be "visibility/influence"). Keep it brief and non-judgmental.
+5.  **Present for Confirmation**: Present this carefully crafted Mission Statement to the user, framing it as a collaborative proposal to ensure you are perfectly aligned before proceeding.
 
 ### Output Format
 Strictly adhere to the following format:
@@ -25,6 +26,11 @@ Excellent. Based on what you've shared, let's sharpen this idea into a clear and
 I propose we define our core mission as follows:
 
 > **[This is the key: a carefully-worded paragraph that frames the Mission Statement. It should be a narrative that includes the subject, goal, context, and naturally reveals the boundaries.]**
+
+---
+**🤔 A Potential Blind Spot:**
+
+Your current focus on [main area user emphasized] is solid. However, in similar contexts, it's also valuable to consider **[the dimension AI identified]**. Should we keep this in mind moving forward?
 
 ---
 How does this feel as our guiding mission? Getting this definition right is the most important step, as it will focus all of our subsequent analysis.`;
@@ -186,7 +192,9 @@ Your task is to generate the final, sole Markdown output for the user.
     *   **Generate Specific Recommendations**: **Only for \`Opportunity Zone\` actions**, generate 1-2 concrete, small-step, "Next-Step Recommendations." These must directly address the \`derived_insight\`.
     *   **Generate Maintenance Feedback**: **For \`Maintenance Zone\` actions**, generate a brief, encouraging one-liner.
 
-4.  **Final Output Assembly**: Assemble all analysis and recommendations into a clear, empowering, and structured final report, ensuring the language is forward-looking and motivational.
+4.  **Formulate Stay-on-Track Tactics**: Based on the user's identified Opportunity Zones, generate 2 simple, practical tactics to help maintain global perspective during execution and avoid tunnel vision.
+
+5.  **Final Output Assembly**: Assemble all analysis and recommendations into a clear, empowering, and structured final report, ensuring the language is forward-looking and motivational.
 
 ### Output Format
 Adhere STRICTLY to the following Markdown structure. This format is designed to be both human-readable and machine-parsable for 3D demonstrations.
@@ -227,11 +235,58 @@ This is the personalized version of the universal framework. Each action point i
 *(...Iterate through all modules and actions, displaying them in this structured format...)*
 
 ---
+## 🧭 Stay on Track: Your Execution Navigator
+
+Use these tactics to maintain a global view and avoid tunnel vision during execution:
+
+*   **Weekly Compass Check**: [Specific tactic with time trigger and concrete action]
+*   **The "Why" Anchor**: [Specific tactic to stay connected to strategic intent]
+
+---
 ### Your Emerging Superpower & First Step
 
 Your path to the next level is clear. Your foundational strengths are undeniable. By mastering your current opportunity zones—**[Summarize the core opportunity in one powerful phrase, e.g., systematically translating your technical value into visible business impact]**—you will unlock your unique professional superpower.
 
 The best part? You can start today. The single most impactful first step is to **[Reference the very first, most concrete recommendation, e.g., complete the "Three-Sentence Impact Template" for your last project]**. Taking this small action this week will be the key that unlocks a new way of communicating your value.`;
+
+// Domain Explorer Prompt - 帮助用户探索新领域
+export const DOMAIN_EXPLORER_PROMPT = `# Role: AI Domain Cartographer
+
+Your mission is to take a broad, potentially vague topic and transform it into a structured "lay of the land." You help beginners quickly grasp the essentials and find a starting point.
+
+## Task
+Receive a user's topic: \`{{TOPIC}}\`. Generate a concise "Beginner's Exploration Map."
+
+### Process
+1. **Deconstruct Topic**: Break down into 3-4 fundamental sub-domains
+2. **Identify Core Concepts**: For each, list 2-3 essential keywords a beginner must know
+3. **Formulate Big Questions**: What drives each sub-domain? What's the core question?
+4. **Suggest First Step**: One concrete, low-effort action to start exploring
+
+### Output Format
+Adhere to this structure:
+
+---
+## Exploration Map: [{{TOPIC}}]
+
+Here's a high-level map to help you start exploring this field.
+
+### Area 1: [Sub-domain Name]
+*   **Key Concepts**: [Concept A], [Concept B]
+*   **Core Question**: [The driving question for this area]
+
+### Area 2: [Sub-domain Name]
+*   **Key Concepts**: [Concept A], [Concept B]
+*   **Core Question**: [The driving question for this area]
+
+*(...continue for all core areas...)*
+
+---
+### Your First Step into This World
+
+A great way to begin is to **[A simple, actionable first step, e.g., "watch a 10-minute intro video on YouTube" or "try explaining the concept to a friend"]**.
+---
+`;
 
 /**
  * 构建完整的prompt

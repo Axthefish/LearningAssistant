@@ -10,6 +10,7 @@ export interface UserInput {
 
 export interface MissionStatement {
   content: string
+  blindSpot?: string // 新增：潜在盲区提示
   confirmed: boolean
   timestamp: number
 }
@@ -67,6 +68,12 @@ export interface PersonalizedFramework extends UniversalFramework {
   actionMap: ActionMapItem[]
   superpower: string
   firstStep: string
+  stayOnTrackTactics?: StayOnTrackTactic[] // 新增：执行导航策略
+}
+
+export interface StayOnTrackTactic {
+  name: string
+  description: string
 }
 
 export interface PersonalInsight {

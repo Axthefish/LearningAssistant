@@ -122,6 +122,21 @@ export default function UniversalFrameworkPage() {
           <Panel defaultSize={50} minSize={30} maxSize={70}>
             <div className="h-full overflow-y-auto p-6 scrollbar-thin">
               <div className="max-w-2xl mx-auto space-y-6">
+                {/* Context说明卡片 */}
+                {energyPillarData && (
+                  <Card className="p-6 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50">
+                    <h3 className="text-lg font-semibold mb-3">🗺️ 为什么需要看全局？</h3>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      很多人容易只盯一个点，但 <strong>{energyPillarData.metadata.systemName}</strong> 其实是个系统
+                    </p>
+                    <ul className="text-sm space-y-1 text-muted-foreground">
+                      <li>• 看清所有支柱</li>
+                      <li>• 理解相互影响</li>
+                      <li>• 避免顾此失彼</li>
+                    </ul>
+                  </Card>
+                )}
+                
                 <ThinkingProcess
                   isThinking={isStreaming}
                   thinkingText="正在为你思考..."

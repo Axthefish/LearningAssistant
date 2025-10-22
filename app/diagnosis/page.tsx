@@ -122,24 +122,21 @@ export default function DiagnosisPage() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Progress */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              步骤 5-6/7: 个性化诊断
-            </span>
-            <span className="font-medium">
+        {/* Progress - 简化版 */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">
               {currentQuestionIndex + 1} / {totalQuestions}
             </span>
           </div>
-          <Progress value={progress} />
+          <Progress value={progress} className="h-1" />
         </div>
         
         {/* Title */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">让我们更深入了解你的情况</h1>
-          <p className="text-muted-foreground">
-            回答这些问题将帮助我为你生成高度个性化的行动建议
+        <div className="space-y-3">
+          <h1 className="text-apple-h1">聊聊你的现状 💬</h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            我需要问几个问题，不是考察，而是找到你独特的起点
           </p>
         </div>
         

@@ -58,9 +58,6 @@ export function GlobalNav() {
               <Home className="w-5 h-5" />
             </Button>
             
-            <div className="hidden md:block">
-              <h2 className="font-semibold">Learning Assistant</h2>
-            </div>
           </div>
           
           <div className="flex items-center space-x-2">

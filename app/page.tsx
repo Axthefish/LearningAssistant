@@ -60,19 +60,20 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent"
-            style={{ lineHeight: '1.1', letterSpacing: '-0.03em' }}
+            className="text-4xl md:text-5xl font-bold tracking-tight"
+            style={{ lineHeight: '1.2', letterSpacing: '-0.02em' }}
           >
-            将想法，变为行动
+            面对新问题，不知从哪开始？
           </motion.h1>
           
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
-            className="text-apple-h3 text-muted-foreground max-w-2xl mx-auto font-normal"
+            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-normal"
+            style={{ lineHeight: '1.6' }}
           >
-            让AI教练帮你把模糊的目标，梳理成清晰的成长路径
+            我会帮你：<span className="text-foreground font-medium">看清全局</span> → <span className="text-foreground font-medium">找到重点</span> → <span className="text-foreground font-medium">明确第一步</span>
           </motion.p>
         </div>
         
@@ -83,16 +84,14 @@ export default function HomePage() {
           transition={{ delay: 0.9, duration: 0.6 }}
         >
           <Card className="p-12 space-y-8 shadow-apple-lg border-0">
-            <div className="space-y-4">
-              <label className="text-apple-h3 font-semibold text-foreground">
-                告诉我，你想要解决什么问题？
-              </label>
+            <div className="space-y-3">
               <Textarea
-                placeholder="例如：我想提升职场影响力、如何平衡工作与生活..."
+                placeholder="告诉我你的困惑或目标&#10;可以很随意、很零散..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                className="min-h-[160px] resize-none text-apple-body border-0 bg-muted/50 focus:bg-muted/70 rounded-xl p-6 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300"
+                className="min-h-[140px] resize-none text-lg border-0 bg-muted/50 focus:bg-muted/70 rounded-2xl p-6 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300"
                 disabled={isSubmitting}
+                style={{ lineHeight: '1.6' }}
               />
             </div>
             
@@ -100,16 +99,16 @@ export default function HomePage() {
               onClick={handleSubmit}
               disabled={!input.trim() || isSubmitting}
               size="lg"
-              className="w-full text-apple-body h-16 rounded-2xl shadow-apple-lg"
+              className="w-full text-lg h-14 rounded-2xl"
             >
               {isSubmitting ? (
-                <span className="flex items-center gap-3">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>正在准备...</span>
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>整理中...</span>
                 </span>
               ) : (
-                <span className="flex items-center gap-3">
-                  <span className="font-semibold">开始</span>
+                <span className="flex items-center gap-2">
+                  <span>开始整理</span>
                   <ArrowRight className="w-5 h-5" />
                 </span>
               )}
@@ -117,28 +116,43 @@ export default function HomePage() {
           </Card>
         </motion.div>
         
-        {/* Examples - Apple风格 */}
+        {/* Examples + Explorer */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.1 }}
-          className="space-y-4"
+          className="space-y-6"
         >
-          <p className="text-apple-caption text-muted-foreground text-center font-medium">
-            或者试试这些场景
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {examples.map((example, index) => (
-              <Button
-                key={index}
-                variant="secondary"
-                onClick={() => setInput(example)}
-                className="justify-start text-left h-auto py-4 px-6 rounded-xl border-0 bg-muted/40 hover:bg-muted/70 transition-all duration-300"
-                disabled={isSubmitting}
-              >
-                <span className="text-apple-body">{example}</span>
-              </Button>
-            ))}
+          <div className="text-center space-y-3">
+            <p className="text-sm text-muted-foreground">
+              常见场景
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {examples.map((example, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  onClick={() => setInput(example)}
+                  className="h-auto py-3 px-4 rounded-xl text-sm"
+                  disabled={isSubmitting}
+                >
+                  {example}
+                </Button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="text-center pt-4 border-t">
+            <p className="text-sm text-muted-foreground mb-3">
+              还没想清楚要做什么？
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => alert('领域探索功能开发中...')}
+              className="rounded-xl"
+            >
+              探索一个新领域
+            </Button>
           </div>
         </motion.div>
       </motion.div>
