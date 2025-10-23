@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useStore, useMissionStatement } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
@@ -18,6 +19,8 @@ import type { UniversalFramework } from '@/lib/types'
 import type { EnergyPillarData } from '@/lib/3d-mapper'
 
 export default function UniversalFrameworkPage() {
+  const t = useTranslations('universal')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const missionStatement = useMissionStatement()
   const existingFramework = useStore(state => state.session?.universalFramework)
@@ -87,9 +90,9 @@ export default function UniversalFrameworkPage() {
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-apple-h1">你的成长蓝图</h1>
+              <h1 className="text-apple-h1">{t('title')}</h1>
               <p className="text-apple-caption text-muted-foreground">
-                基于你的目标，我们为你梳理了清晰的行动路径
+                {t('subtitle')}
               </p>
             </div>
             {showConfirmation && (
@@ -101,11 +104,11 @@ export default function UniversalFrameworkPage() {
                 {isNavigating ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    准备中...
+                    {t('preparing')}
                   </>
                 ) : (
                   <>
-                    为我定制
+                    {t('customizeButton')}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </>
                 )}
@@ -125,14 +128,17 @@ export default function UniversalFrameworkPage() {
                 {/* Context说明卡片 */}
                 {energyPillarData && (
                   <Card className="p-6 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50">
-                    <h3 className="text-lg font-semibold mb-3">🗺️ 为什么需要看全局？</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      很多人容易只盯一个点，但 <strong>{energyPillarData.metadata.systemName}</strong> 其实是个系统
-                    </p>
+                    <h3 className="text-lg font-semibold mb-3">{t('contextTitle')}</h3>
+                    <p 
+                      className="text-sm text-muted-foreground mb-3"
+                      dangerouslySetInnerHTML={{
+                        __html: t('contextBody', { systemName: energyPillarData.metadata.systemName })
+                      }}
+                    />
                     <ul className="text-sm space-y-1 text-muted-foreground">
-                      <li>• 看清所有支柱</li>
-                      <li>• 理解相互影响</li>
-                      <li>• 避免顾此失彼</li>
+                      <li>• {t('contextPoints.pillars')}</li>
+                      <li>• {t('contextPoints.interactions')}</li>
+                      <li>• {t('contextPoints.balance')}</li>
                     </ul>
                   </Card>
                 )}
@@ -151,11 +157,11 @@ export default function UniversalFrameworkPage() {
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(content || markdownContent)
-                          alert('已复制到剪贴板')
+                          alert(tCommon('copied'))
                         }}
                         className="absolute top-6 right-6 px-3 py-1.5 text-xs bg-secondary hover:bg-secondary/80 rounded-lg transition-colors z-10 shadow-sm"
                       >
-                        复制
+                        {tCommon('copy')}
                       </button>
                       <div className="pr-16">
                         <StreamingMessage
