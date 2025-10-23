@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,6 +11,7 @@ import { ArrowRight, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function HomePage() {
+  const t = useTranslations('homepage')
   const router = useRouter()
   const setUserInput = useStore(state => state.setUserInput)
   const goToStep = useStore(state => state.goToStep)
@@ -82,7 +84,7 @@ export default function HomePage() {
             className="text-4xl md:text-5xl font-bold tracking-tight"
             style={{ lineHeight: '1.2', letterSpacing: '-0.02em' }}
           >
-            面对新问题，不知从哪开始？
+{t('title')}
           </motion.h1>
           
           <motion.p 
@@ -91,9 +93,12 @@ export default function HomePage() {
             transition={{ delay: 0.7 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto font-normal"
             style={{ lineHeight: '1.6' }}
-          >
-            我会帮你：<span className="text-foreground font-medium">看清全局</span> → <span className="text-foreground font-medium">找到重点</span> → <span className="text-foreground font-medium">明确第一步</span>
-          </motion.p>
+            dangerouslySetInnerHTML={{ 
+              __html: t('subtitle')
+                .replace(/<highlight>/g, '<span class="text-foreground font-medium">')
+                .replace(/<\/highlight>/g, '</span>')
+            }}
+          />
         </div>
         
         {/* Main Input - Apple风格大卡片 */}
@@ -105,7 +110,7 @@ export default function HomePage() {
           <Card className="p-12 space-y-8 shadow-apple-lg border-0">
             <div className="space-y-3">
               <Textarea
-                placeholder="告诉我你的困惑或目标&#10;可以很随意、很零散..."
+                placeholder={t('inputPlaceholder')}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 className="min-h-[140px] resize-none text-lg border-0 bg-muted/50 focus:bg-muted/70 rounded-2xl p-6 focus-visible:ring-2 focus-visible:ring-primary/20 transition-all duration-300"
@@ -123,11 +128,11 @@ export default function HomePage() {
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>整理中...</span>
+                  <span>{t('loadingButton')}</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <span>开始整理</span>
+                  <span>{t('startButton')}</span>
                   <ArrowRight className="w-5 h-5" />
                 </span>
               )}
@@ -144,18 +149,18 @@ export default function HomePage() {
         >
           <div className="text-center space-y-3">
             <p className="text-sm text-muted-foreground">
-              常见场景
+              {t('scenariosTitle')}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {examples.map((example, index) => (
+              {['career', 'team', 'learning', 'balance'].map((key, index) => (
                 <Button
                   key={index}
                   variant="ghost"
-                  onClick={() => setInput(example)}
+                  onClick={() => setInput(t(`scenarios.${key}`))}
                   className="h-auto py-3 px-4 rounded-xl text-sm"
                   disabled={isSubmitting}
                 >
-                  {example}
+                  {t(`scenarios.${key}`)}
                 </Button>
               ))}
             </div>
