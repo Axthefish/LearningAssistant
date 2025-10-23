@@ -107,16 +107,11 @@ export default function InitialExtractionPage() {
           >
             <Card className="p-6 space-y-4">
               {isEditing ? (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    编辑你的使命陈述：
-                  </label>
-                  <Textarea
-                    value={editedContent}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                    className="min-h-[200px]"
-                  />
-                </div>
+                <Textarea
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  className="min-h-[200px]"
+                />
               ) : (
                 <StreamingMessage
                   content={content}

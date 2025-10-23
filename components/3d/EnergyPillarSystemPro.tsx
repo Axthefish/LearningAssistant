@@ -873,7 +873,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
       {tipsOpen ? (
         <div className="absolute top-4 left-4 bg-black/80 text-white px-4 py-3 rounded-xl text-sm z-50 backdrop-blur-sm border border-white/10 shadow-apple-lg">
           <div className="flex items-center justify-between mb-2">
-            <p className="font-semibold">💡 交互提示</p>
+            <p className="font-semibold">💡 Tips</p>
             <button
               onClick={() => setTipsOpen(false)}
               className="text-white/60 hover:text-white transition-colors ml-4"
@@ -882,9 +882,9 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
             </button>
           </div>
           <ul className="space-y-1 text-xs text-white/80">
-            <li>• 拖拽旋转视角</li>
-            <li>• 悬停查看模块</li>
-            <li>• 点击展开详情</li>
+            <li>• Drag to rotate</li>
+            <li>• Hover to view</li>
+            <li>• Click for details</li>
           </ul>
         </div>
       ) : (
@@ -979,7 +979,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
                       
                       {particle.coachNote && (
                         <div className="text-xs text-blue-600 dark:text-blue-400 leading-snug bg-blue-500/10 rounded px-2 py-1.5 border-l-2 border-blue-500">
-                          <div className="font-medium mb-0.5">💡 个性化建议</div>
+                          <div className="font-medium mb-0.5">💡 Coach's Note</div>
                           {particle.coachNote}
                         </div>
                       )}
