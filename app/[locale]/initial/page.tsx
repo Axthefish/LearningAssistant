@@ -135,12 +135,12 @@ export default function InitialExtractionPage() {
                         }}
                         variant="outline"
                       >
-                        取消
+                        Cancel
                       </Button>
                       <Button
                         onClick={() => setIsEditing(false)}
                       >
-                        保存修改
+                        {tCommon('save')}
                       </Button>
                     </>
                   ) : (
@@ -153,14 +153,14 @@ export default function InitialExtractionPage() {
                         variant="outline"
                       >
                         <Edit2 className="w-4 h-4 mr-2" />
-                        修改
+                        {t('editButton')}
                       </Button>
                       <Button
                         onClick={handleConfirm}
                         disabled={isConfirmed}
                       >
                         <Check className="w-4 h-4 mr-2" />
-                        确认，继续下一步
+                        {t('confirmAndContinue')}
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>
                     </>
