@@ -979,7 +979,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
                       
                       {particle.coachNote && (
                         <div className="text-xs text-blue-600 dark:text-blue-400 leading-snug bg-blue-500/10 rounded px-2 py-1.5 border-l-2 border-blue-500">
-                          <div className="font-medium mb-0.5">💡 Coach's Note</div>
+                          <div className="font-medium mb-0.5">💡 Coach&apos;s Note</div>
                           {particle.coachNote}
                         </div>
                       )}
