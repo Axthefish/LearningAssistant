@@ -5,7 +5,8 @@
  * Agent 7: UI/UX Polish Expert
  */
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from '@/i18n/routing'
+import { useLocale } from 'next-intl'
 import { useStore, useCurrentStep } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,34 +18,23 @@ import {
 import { Menu, History, Home, Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SessionHistory } from './SessionHistory'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 export function GlobalNav() {
   const router = useRouter()
+  const pathname = usePathname()
+  const locale = useLocale()
   const currentStep = useCurrentStep()
   const resetSession = useStore(state => state.resetSession)
   const { theme, setTheme } = useTheme()
   
   const [showHistory, setShowHistory] = useState(false)
-  const [currentLocale, setCurrentLocale] = useState<string>('en')
-  
-  // 初始化语言
-  useEffect(() => {
-    const saved = localStorage.getItem('preferredLanguage')
-    if (saved) {
-      setCurrentLocale(saved)
-    }
-  }, [])
   
   // 语言切换
-  const handleLanguageChange = (locale: string) => {
-    console.log('Switching language to:', locale)
-    setCurrentLocale(locale)
-    localStorage.setItem('preferredLanguage', locale)
-    // 强制刷新页面应用新语言
-    setTimeout(() => {
-      window.location.reload()
-    }, 100)
+  const handleLanguageChange = (newLocale: string) => {
+    console.log('Switching language to:', newLocale)
+    // 使用 next-intl 的路由器切换语言，会自动设置 cookie
+    router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
   }
   
   const handleGoHome = async () => {
@@ -112,12 +102,12 @@ export function GlobalNav() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
-                  <span className={currentLocale === 'en' ? 'font-semibold' : ''}>
+                  <span className={locale === 'en' ? 'font-semibold' : ''}>
                     English
                   </span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleLanguageChange('zh')}>
-                  <span className={currentLocale === 'zh' ? 'font-semibold' : ''}>
+                  <span className={locale === 'zh' ? 'font-semibold' : ''}>
                     简体中文
                   </span>
                 </DropdownMenuItem>
