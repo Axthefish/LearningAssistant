@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   useStore,
   useUniversalFramework,
@@ -22,6 +23,8 @@ import type { PersonalizedFramework } from '@/lib/types'
 import type { EnergyPillarData } from '@/lib/3d-mapper'
 
 export default function PersonalizedFrameworkPage() {
+  const t = useTranslations('personalized')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const framework = useUniversalFramework()
   const userAnswers = useUserAnswers()
@@ -108,20 +111,20 @@ export default function PersonalizedFrameworkPage() {
         <div className="container mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">你的个性化行动框架</h1>
+              <h1 className="text-2xl font-bold">{t('title')}</h1>
               <p className="text-sm text-muted-foreground">
-                步骤 7/7 - 完成 ✨
+                {t('subtitle')}
               </p>
             </div>
             {isComplete && (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" onClick={handleExport}>
                   <Download className="w-4 h-4 mr-2" />
-                  导出
+                  {t('exportButton')}
                 </Button>
                 <Button onClick={handleStartNew}>
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  开始新会话
+                  {t('newSessionButton')}
                 </Button>
               </div>
             )}

@@ -17,7 +17,7 @@ import {
 import { Menu, History, Home, Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SessionHistory } from './SessionHistory'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function GlobalNav() {
   const router = useRouter()
@@ -28,18 +28,24 @@ export function GlobalNav() {
   const [showHistory, setShowHistory] = useState(false)
   const [currentLocale, setCurrentLocale] = useState<string>('en')
   
+  // 初始化语言
+  useEffect(() => {
+    const saved = localStorage.getItem('preferredLanguage')
+    if (saved) {
+      setCurrentLocale(saved)
+    }
+  }, [])
+  
   // 语言切换
   const handleLanguageChange = (locale: string) => {
+    console.log('Switching language to:', locale)
     setCurrentLocale(locale)
     localStorage.setItem('preferredLanguage', locale)
-    window.location.reload() // 简单粗暴但有效
+    // 强制刷新页面应用新语言
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
   }
-  
-  // 初始化语言
-  useState(() => {
-    const saved = localStorage.getItem('preferredLanguage') || 'en'
-    setCurrentLocale(saved)
-  })
   
   const handleGoHome = async () => {
     if (currentStep > 1) {
