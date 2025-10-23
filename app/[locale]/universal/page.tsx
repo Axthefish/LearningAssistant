@@ -153,14 +153,16 @@ export default function UniversalFrameworkPage() {
                           navigator.clipboard.writeText(content || markdownContent)
                           alert('已复制到剪贴板')
                         }}
-                        className="absolute top-4 right-4 px-3 py-1.5 text-xs bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                        className="absolute top-6 right-6 px-3 py-1.5 text-xs bg-secondary hover:bg-secondary/80 rounded-lg transition-colors z-10 shadow-sm"
                       >
                         复制
                       </button>
-                      <StreamingMessage
-                        content={content || markdownContent}
-                        isStreaming={isStreaming}
-                      />
+                      <div className="pr-16">
+                        <StreamingMessage
+                          content={content || markdownContent}
+                          isStreaming={isStreaming}
+                        />
+                      </div>
                     </Card>
                   </motion.div>
                 )}

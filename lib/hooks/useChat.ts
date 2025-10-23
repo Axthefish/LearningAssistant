@@ -27,10 +27,20 @@ export function useChat(options: UseChatOptions = {}) {
       setError(null)
       
       try {
+        // 自动添加当前语言到variables
+        const locale = localStorage.getItem('preferredLanguage') || 'en'
+        const languageName = locale === 'zh' ? 'Simplified Chinese' : 'English'
+        
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ promptType, variables }),
+          body: JSON.stringify({ 
+            promptType, 
+            variables: {
+              ...variables,
+              LANGUAGE: languageName
+            }
+          }),
         })
         
         if (!response.ok) {

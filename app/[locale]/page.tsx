@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,25 @@ export default function HomePage() {
   
   const [input, setInput] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // 清理可能导致路由问题的旧数据
+  useEffect(() => {
+    // 检查并清理旧的localStorage数据结构
+    const currentSession = localStorage.getItem('learning-assistant-current-session')
+    if (currentSession) {
+      try {
+        const parsed = JSON.parse(currentSession)
+        // 如果数据结构有问题，清除
+        if (!parsed.id || !parsed.createdAt) {
+          console.log('Clearing corrupted session data')
+          localStorage.removeItem('learning-assistant-current-session')
+        }
+      } catch (e) {
+        console.log('Clearing invalid session data')
+        localStorage.removeItem('learning-assistant-current-session')
+      }
+    }
+  }, [])
   
   const handleSubmit = async () => {
     if (!input.trim()) return
