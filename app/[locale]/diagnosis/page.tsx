@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   useStore,
   useUniversalFramework,
@@ -21,6 +22,8 @@ import type { DiagnosticQuestion as DiagnosticQuestionType, UserAnswer } from '@
 import { parseDiagnosticQuestions } from '@/lib/markdown-parser'
 
 export default function DiagnosisPage() {
+  const t = useTranslations('diagnosis')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const framework = useUniversalFramework()
   const existingQuestions = useDiagnosticQuestions()
@@ -134,9 +137,9 @@ export default function DiagnosisPage() {
         
         {/* Title */}
         <div className="space-y-3">
-          <h1 className="text-apple-h1">聊聊你的现状 💬</h1>
+          <h1 className="text-apple-h1">{t('title')}</h1>
           <p className="text-lg text-muted-foreground leading-relaxed">
-            我需要问几个问题，不是考察，而是找到你独特的起点
+            {t('subtitle')}
           </p>
         </div>
         
@@ -145,7 +148,7 @@ export default function DiagnosisPage() {
           <>
             <div className="flex items-center gap-3 text-muted-foreground">
               <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              <span className="text-apple-body">正在为你准备问题...</span>
+              <span className="text-apple-body">{t('preparingQuestions')}</span>
             </div>
             
             {/* 骨架屏预览 */}
