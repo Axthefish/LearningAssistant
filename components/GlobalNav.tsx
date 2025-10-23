@@ -32,8 +32,8 @@ export function GlobalNav() {
   
   // 语言切换
   const handleLanguageChange = (newLocale: string) => {
-    console.log('Switching language to:', newLocale)
-    // 使用 next-intl 的路由器切换语言，会自动设置 cookie
+    // 使用 next-intl 路由器切换语言
+    // as-needed 模式：默认语言(en)不显示前缀，非默认语言(zh)显示 /zh 前缀
     router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
   }
   
