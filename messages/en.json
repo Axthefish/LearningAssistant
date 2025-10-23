@@ -35,7 +35,10 @@
     "title": "Clarify Your Goal",
     "subtitle": "Based on your thoughts, let's refine a clear mission together",
     "yourThoughts": "Your Thoughts",
-    "backButton": "Back"
+    "backButton": "Back",
+    "editButton": "Edit",
+    "confirmButton": "Yes, that's it",
+    "confirmAndContinue": "Confirm, continue"
   },
   "universal": {
     "title": "Your Growth Blueprint",

@@ -35,7 +35,10 @@
     "title": "明确你的目标",
     "subtitle": "基于你的想法，我们一起提炼出清晰的使命",
     "yourThoughts": "你的想法",
-    "backButton": "返回"
+    "backButton": "返回",
+    "editButton": "修改",
+    "confirmButton": "对，就是这样",
+    "confirmAndContinue": "确认，继续下一步"
   },
   "universal": {
     "title": "你的成长蓝图",

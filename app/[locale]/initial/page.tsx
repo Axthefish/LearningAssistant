@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { useStore, useUserInput } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
@@ -13,6 +14,8 @@ import { ArrowLeft, ArrowRight, Edit2, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function InitialExtractionPage() {
+  const t = useTranslations('initial')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const userInput = useUserInput()
   const setMissionStatement = useStore(state => state.setMissionStatement)
@@ -75,21 +78,21 @@ export default function InitialExtractionPage() {
         <div className="flex items-center">
           <Button variant="ghost" onClick={handleBack} className="rounded-xl">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="text-apple-body">返回</span>
+            <span className="text-apple-body">{t('backButton')}</span>
           </Button>
         </div>
         
         {/* Title - Apple大标题 */}
         <div className="space-y-4 text-center">
-          <h1 className="text-apple-hero">明确你的目标</h1>
+          <h1 className="text-apple-hero">{t('title')}</h1>
           <p className="text-apple-h3 text-muted-foreground max-w-3xl mx-auto font-normal">
-            基于你的想法，我们一起提炼出清晰的使命
+            {t('subtitle')}
           </p>
         </div>
         
         {/* User Input Recap - Apple风格卡片 */}
         <Card className="p-8 bg-muted/20 border-0">
-          <p className="text-apple-caption text-muted-foreground mb-3 font-medium">你的想法</p>
+          <p className="text-apple-caption text-muted-foreground mb-3 font-medium">{t('yourThoughts')}</p>
           <p className="text-apple-body leading-relaxed">{userInput?.content}</p>
         </Card>
         
