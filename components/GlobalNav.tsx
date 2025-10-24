@@ -7,7 +7,6 @@
 
 import { useRouter, usePathname } from '@/i18n/routing'
 import { useLocale } from 'next-intl'
-import { usePathname as usePathnameNext } from 'next/navigation'
 import { useStore, useCurrentStep } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -23,8 +22,7 @@ import { useState } from 'react'
 
 export function GlobalNav() {
   const router = useRouter()
-  const pathname = usePathname()  // next-intl 版本，不包含 locale
-  const pathnameNext = usePathnameNext()  // Next.js 原生版本，包含完整路径
+  const pathname = usePathname()
   const locale = useLocale()
   const currentStep = useCurrentStep()
   const resetSession = useStore(state => state.resetSession)
@@ -32,31 +30,11 @@ export function GlobalNav() {
   
   const [showHistory, setShowHistory] = useState(false)
   
-  // 语言切换 - 无刷新丝滑切换
+  // 语言切换 - 使用 localePrefix: 'always' 模式，简单可靠
   const handleLanguageChange = (newLocale: string) => {
-    console.log('Language switch debug:', {
-      'current locale': locale,
-      'new locale': newLocale,
-      'pathname (next-intl)': pathname,
-      'pathnameNext (next.js)': pathnameNext
-    })
-    
-    // pathname 来自 next-intl，应该已经是不带 locale 的路径
-    // 但如果出错了，我们手动清理一下
-    let cleanPath = pathname
-    
-    // 确保路径不包含 locale 前缀
-    for (const loc of ['en', 'zh']) {
-      if (cleanPath.startsWith(`/${loc}/`) || cleanPath === `/${loc}`) {
-        cleanPath = cleanPath.slice(loc.length + 1) || '/'
-        break
-      }
-    }
-    
-    console.log('Using clean path:', cleanPath)
-    
-    // 使用干净的路径进行切换
-    router.push(cleanPath, { locale: newLocale as 'en' | 'zh' })
+    // pathname 来自 next-intl，返回不带 locale 的路径（如 '/', '/initial'）
+    // router.replace 会自动加上新的 locale 前缀（如 '/en/', '/zh/'）
+    router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
   }
   
   const handleGoHome = async () => {
