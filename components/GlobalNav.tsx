@@ -32,15 +32,9 @@ export function GlobalNav() {
   
   // 语言切换
   const handleLanguageChange = (newLocale: string) => {
-    console.log('=== Language Switch Debug ===')
-    console.log('Current locale:', locale)
-    console.log('New locale:', newLocale)
-    console.log('Pathname from usePathname:', pathname)
-    
     // 使用 next-intl 路由器切换语言
     // as-needed 模式：默认语言(en)不显示前缀，非默认语言(zh)显示 /zh 前缀
-    // usePathname() 应该返回不包含 locale 的路径
-    router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
+    router.push(pathname, { locale: newLocale as 'en' | 'zh' })
   }
   
   const handleGoHome = async () => {
