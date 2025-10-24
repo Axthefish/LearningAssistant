@@ -13,18 +13,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // 如果已经有 locale 前缀，直接继续
+  // 如果路径已经以 /en 或 /zh 开头，直接继续
   if (pathname.startsWith('/en') || pathname.startsWith('/zh')) {
     return NextResponse.next();
   }
   
-  // 如果是中文路径（/zh 开头），继续处理
-  if (pathname.startsWith('/zh')) {
-    return NextResponse.next();
-  }
-  
-  // 其他所有路径（英文），重写到 /en 但不改变 URL
-  // 这样用户看到的是 / 但内部处理为 /en
+  // 其他所有路径（英文）重写到 /en，但 URL 保持不变
+  // 例如：用户访问 / 实际处理为 /en，访问 /initial 实际处理为 /en/initial
   return NextResponse.rewrite(new URL(`/en${pathname}`, request.url));
 }
 
