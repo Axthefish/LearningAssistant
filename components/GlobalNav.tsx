@@ -30,12 +30,13 @@ export function GlobalNav() {
   
   const [showHistory, setShowHistory] = useState(false)
   
-  // 语言切换 - 使用 Link href 的方式，最可靠
+  // 语言切换 - 直接使用 pathname（next-intl 保证返回不带 locale 的路径）
   const handleLanguageChange = (newLocale: string) => {
-    // 使用 router.push 配合当前路径，确保路径正确
-    // pathname 是不带 locale 的（如 '/', '/initial'）
-    const targetPath = pathname === '/' ? '/' : pathname
-    router.push(targetPath, { locale: newLocale as 'en' | 'zh' })
+    // pathname 来自 next-intl，已经是干净的路径（不包含 /en 或 /zh）
+    // router.replace 会根据 localePrefix: 'as-needed' 配置自动处理：
+    // - 切换到 'en'：跳转到 pathname (如 '/')
+    // - 切换到 'zh'：跳转到 /zh + pathname (如 '/zh')
+    router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
   }
   
   const handleGoHome = async () => {
