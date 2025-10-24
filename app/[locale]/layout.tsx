@@ -1,5 +1,5 @@
 import {NextIntlClientProvider} from 'next-intl';
-import {getMessages, unstable_setRequestLocale} from 'next-intl/server';
+import {getMessages} from 'next-intl/server';
 import { StoreInitializer } from "@/components/StoreInitializer";
 import { GlobalNav } from "@/components/GlobalNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -22,9 +22,6 @@ export default async function LocaleLayout({
   if (!locales.includes(locale as any)) {
     locale = 'en'; // 回退到默认语言
   }
-  
-  // 设置 locale
-  unstable_setRequestLocale(locale);
   
   // 获取消息
   const messages = await getMessages({locale});
