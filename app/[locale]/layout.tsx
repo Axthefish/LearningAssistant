@@ -34,7 +34,7 @@ export default async function LocaleLayout({
       <ErrorBoundary>
         <ThemeProvider
           attribute="class"
-          defaultLocale={locale}
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
