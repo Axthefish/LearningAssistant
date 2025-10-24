@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
+import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import {
   useStore,
   useUniversalFramework,
@@ -25,6 +26,7 @@ export default function DiagnosisPage() {
   const t = useTranslations('diagnosis')
   const tCommon = useTranslations('common')
   const router = useRouter()
+  const locale = useLocale() as Locale
   const framework = useUniversalFramework()
   const existingQuestions = useDiagnosticQuestions()
   const existingAnswers = useUserAnswers()
@@ -50,7 +52,7 @@ export default function DiagnosisPage() {
   
   useEffect(() => {
     if (!framework) {
-      router.push('/universal')
+      router.push(getPathWithLocale('/universal', locale))
       return
     }
     
@@ -117,7 +119,7 @@ export default function DiagnosisPage() {
     }
     
     await goToStep(7)
-    router.push('/personalized')
+    router.push(getPathWithLocale('/personalized', locale))
   }
   
   const allQuestionsAnswered = questions.every(q => answers[q.id]?.trim())

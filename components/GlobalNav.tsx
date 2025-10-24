@@ -5,7 +5,7 @@
  * Agent 7: UI/UX Polish Expert
  */
 
-import { useRouter, usePathname } from '@/i18n/routing'
+import { useRouter as useNextRouter, usePathname as useNextPathname } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { useStore, useCurrentStep } from '@/lib/store'
 import { Button } from '@/components/ui/button'
@@ -19,40 +19,45 @@ import { Menu, History, Home, Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SessionHistory } from './SessionHistory'
 import { useState } from 'react'
+import { getPathnameWithoutLocale, getPathWithLocale, type Locale } from '@/i18n/routing'
 
 export function GlobalNav() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const locale = useLocale()
+  const router = useNextRouter()
+  const pathname = useNextPathname()
+  const locale = useLocale() as Locale
   const currentStep = useCurrentStep()
   const resetSession = useStore(state => state.resetSession)
   const { theme, setTheme } = useTheme()
   
   const [showHistory, setShowHistory] = useState(false)
   
-  // 语言切换 - 直接使用 pathname（next-intl 保证返回不带 locale 的路径）
-  const handleLanguageChange = (newLocale: string) => {
-    // pathname 来自 next-intl，已经是干净的路径（不包含 /en 或 /zh）
-    // router.replace 会根据 localePrefix: 'as-needed' 配置自动处理：
-    // - 切换到 'en'：跳转到 pathname (如 '/')
-    // - 切换到 'zh'：跳转到 /zh + pathname (如 '/zh')
-    router.replace(pathname, { locale: newLocale as 'en' | 'zh' })
+  // 语言切换 - 使用原生 Next.js 路由
+  const handleLanguageChange = (newLocale: Locale) => {
+    // 获取不带 locale 的干净路径
+    const cleanPath = getPathnameWithoutLocale(pathname)
+    // 生成新的路径
+    const newPath = getPathWithLocale(cleanPath, newLocale)
+    // 直接跳转
+    router.push(newPath)
   }
   
   const handleGoHome = async () => {
     if (currentStep > 1) {
       if (confirm('确定要返回首页吗？当前进度将被保存。')) {
-        router.push('/')
+        const homePath = getPathWithLocale('/', locale)
+        router.push(homePath)
       }
     } else {
-      router.push('/')
+      const homePath = getPathWithLocale('/', locale)
+      router.push(homePath)
     }
   }
   
   const handleNewSession = async () => {
     if (confirm('确定要开始新会话吗？当前进度将被保存到历史记录。')) {
       await resetSession()
-      router.push('/')
+      const homePath = getPathWithLocale('/', locale)
+      router.push(homePath)
     }
   }
   
@@ -161,4 +166,3 @@ export function GlobalNav() {
     </>
   )
 }
-

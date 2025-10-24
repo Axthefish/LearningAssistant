@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
+import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import {
   useStore,
   useUniversalFramework,
@@ -26,6 +27,7 @@ export default function PersonalizedFrameworkPage() {
   const t = useTranslations('personalized')
   const tCommon = useTranslations('common')
   const router = useRouter()
+  const locale = useLocale() as Locale
   const framework = useUniversalFramework()
   const userAnswers = useUserAnswers()
   const storedPersonalized = useStoredPersonalizedFramework()
@@ -57,7 +59,7 @@ export default function PersonalizedFrameworkPage() {
   
   useEffect(() => {
     if (!framework || !userAnswers || userAnswers.length === 0) {
-      router.push('/diagnosis')
+      router.push(getPathWithLocale('/diagnosis', locale))
       return
     }
     
@@ -99,7 +101,7 @@ export default function PersonalizedFrameworkPage() {
   const handleStartNew = async () => {
     if (confirm('确定要开始新的会话吗？当前进度将被保存到历史记录。')) {
       await resetSession()
-      router.push('/')
+      router.push(getPathWithLocale('/', locale))
     }
   }
   

@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
+import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -13,6 +14,7 @@ import { motion } from 'framer-motion'
 export default function HomePage() {
   const t = useTranslations('homepage')
   const router = useRouter()
+  const locale = useLocale() as Locale
   const setUserInput = useStore(state => state.setUserInput)
   const goToStep = useStore(state => state.goToStep)
   
@@ -48,7 +50,8 @@ export default function HomePage() {
     await goToStep(2)
     
     // 跳转到步骤2
-    router.push('/initial')
+    const initialPath = getPathWithLocale('/initial', locale)
+    router.push(initialPath)
   }
   
   const examples = [

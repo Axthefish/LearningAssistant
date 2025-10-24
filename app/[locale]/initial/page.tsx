@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
+import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import { useStore, useUserInput } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
@@ -17,6 +18,7 @@ export default function InitialExtractionPage() {
   const t = useTranslations('initial')
   const tCommon = useTranslations('common')
   const router = useRouter()
+  const locale = useLocale() as Locale
   const userInput = useUserInput()
   const setMissionStatement = useStore(state => state.setMissionStatement)
   const goToStep = useStore(state => state.goToStep)
@@ -35,7 +37,7 @@ export default function InitialExtractionPage() {
   
   useEffect(() => {
     if (!userInput?.content) {
-      router.push('/')
+      router.push(getPathWithLocale('/', locale))
       return
     }
     
@@ -64,11 +66,11 @@ export default function InitialExtractionPage() {
     setIsConfirmed(true)
     
     // 跳转到步骤3
-    router.push('/universal')
+    router.push(getPathWithLocale('/universal', locale))
   }
   
   const handleBack = () => {
-    router.push('/')
+    router.push(getPathWithLocale('/', locale))
   }
   
   return (

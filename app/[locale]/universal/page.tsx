@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from '@/i18n/routing'
-import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
+import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import { useStore, useMissionStatement } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
@@ -22,6 +23,7 @@ export default function UniversalFrameworkPage() {
   const t = useTranslations('universal')
   const tCommon = useTranslations('common')
   const router = useRouter()
+  const locale = useLocale() as Locale
   const missionStatement = useMissionStatement()
   const existingFramework = useStore(state => state.session?.universalFramework)
   const setUniversalFramework = useStore(state => state.setUniversalFramework)
@@ -54,7 +56,7 @@ export default function UniversalFrameworkPage() {
   
   useEffect(() => {
     if (!missionStatement?.confirmed) {
-      router.push('/initial')
+      router.push(getPathWithLocale('/initial', locale))
       return
     }
     
@@ -80,7 +82,7 @@ export default function UniversalFrameworkPage() {
   const handleConfirmPersonalization = async () => {
     setIsNavigating(true)
     await confirmPersonalization()
-    router.push('/diagnosis')
+    router.push(getPathWithLocale('/diagnosis', locale))
   }
   
   return (

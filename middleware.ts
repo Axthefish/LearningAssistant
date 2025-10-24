@@ -1,12 +1,27 @@
-import createMiddleware from 'next-intl/middleware';
-import {routing} from './i18n/routing';
- 
-export default createMiddleware(routing);
- 
+import { NextRequest, NextResponse } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // 跳过 API、静态文件等
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/_vercel') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+  
+  // 如果是中文路径（/zh 开头），继续处理
+  if (pathname.startsWith('/zh')) {
+    return NextResponse.next();
+  }
+  
+  // 其他所有路径都是英文
+  return NextResponse.next();
+}
+
 export const config = {
-  // Match all pathnames except for
-  // - … if they start with `/api`, `/_next` or `/_vercel`
-  // - … the ones containing a dot (e.g. `favicon.ico`)
   matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
 };
-

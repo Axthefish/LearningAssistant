@@ -1,12 +1,15 @@
 import {NextIntlClientProvider} from 'next-intl';
-import {getMessages} from 'next-intl/server';
-import {notFound} from 'next/navigation';
-import {routing} from '@/i18n/routing';
+import {getMessages, unstable_setRequestLocale} from 'next-intl/server';
 import { StoreInitializer } from "@/components/StoreInitializer";
 import { GlobalNav } from "@/components/GlobalNav";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
+import { locales } from '@/i18n/routing';
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({locale}));
+}
 
 export default async function LocaleLayout({
   children,
@@ -15,20 +18,23 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: {locale: string};
 }) {
-  // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
-    notFound();
+  // 验证 locale
+  if (!locales.includes(locale as any)) {
+    locale = 'en'; // 回退到默认语言
   }
- 
-  // Providing all messages to the client
-  const messages = await getMessages();
+  
+  // 设置 locale
+  unstable_setRequestLocale(locale);
+  
+  // 获取消息
+  const messages = await getMessages({locale});
  
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       <ErrorBoundary>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultLocale={locale}
           enableSystem
           disableTransitionOnChange
         >
@@ -42,4 +48,3 @@ export default async function LocaleLayout({
     </NextIntlClientProvider>
   );
 }
-
