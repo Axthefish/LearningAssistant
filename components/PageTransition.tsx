@@ -6,7 +6,7 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { usePathname } from '@/i18n/routing'
+import { usePathname } from 'next/navigation'
 import { ReactNode } from 'react'
 
 export function PageTransition({ children }: { children: ReactNode }) {
