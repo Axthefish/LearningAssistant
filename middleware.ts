@@ -18,9 +18,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
-  // 其他所有路径（英文）重写到 /en，但 URL 保持不变
-  // 例如：用户访问 / 实际处理为 /en，访问 /initial 实际处理为 /en/initial
-  return NextResponse.rewrite(new URL(`/en${pathname}`, request.url));
+  // 其他所有路径重定向到 /en（显式 URL，利于 SEO）
+  // 例如：用户访问 / 重定向到 /en，访问 /initial 重定向到 /en/initial
+  return NextResponse.redirect(new URL(`/en${pathname}`, request.url));
 }
 
 export const config = {
