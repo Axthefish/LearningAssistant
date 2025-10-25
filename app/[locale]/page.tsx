@@ -13,6 +13,7 @@ import { motion } from 'framer-motion'
 
 export default function HomePage() {
   const t = useTranslations('homepage')
+  const tCommon = useTranslations('common')
   const router = useRouter()
   const locale = useLocale() as Locale
   const setUserInput = useStore(state => state.setUserInput)
@@ -20,25 +21,40 @@ export default function HomePage() {
   
   const [input, setInput] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showContinueBanner, setShowContinueBanner] = useState(false)
+  const currentSession = useStore(state => state.session)
   
   // 清理可能导致路由问题的旧数据
   useEffect(() => {
-    // 检查并清理旧的localStorage数据结构
-    const currentSession = localStorage.getItem('learning-assistant-current-session')
-    if (currentSession) {
-      try {
-        const parsed = JSON.parse(currentSession)
-        // 如果数据结构有问题，清除
-        if (!parsed.id || !parsed.createdAt) {
-          console.log('Clearing corrupted session data')
-          localStorage.removeItem('learning-assistant-current-session')
+    // 检查并清理旧的localStorage数据结构（支持新旧两种键名）
+    const oldKey = 'learning-assistant-current-session'
+    const newKey = 'learning-assistant:current-session'
+    
+    const checkAndClean = (key: string) => {
+      const data = localStorage.getItem(key)
+      if (data) {
+        try {
+          const parsed = JSON.parse(data)
+          // 如果数据结构有问题，清除
+          if (!parsed.id || !parsed.createdAt) {
+            console.log(`Clearing corrupted session data from ${key}`)
+            localStorage.removeItem(key)
+          }
+        } catch (e) {
+          console.log(`Clearing invalid session data from ${key}`)
+          localStorage.removeItem(key)
         }
-      } catch (e) {
-        console.log('Clearing invalid session data')
-        localStorage.removeItem('learning-assistant-current-session')
       }
     }
-  }, [])
+    
+    checkAndClean(oldKey)
+    checkAndClean(newKey)
+    
+    // 检查是否有未完成的会话
+    if (currentSession && currentSession.currentStep > 1 && currentSession.currentStep < 7) {
+      setShowContinueBanner(true)
+    }
+  }, [currentSession])
   
   const handleSubmit = async () => {
     if (!input.trim()) return
@@ -61,8 +77,59 @@ export default function HomePage() {
     '改善工作生活平衡',
   ]
   
+  const handleContinueSession = () => {
+    if (!currentSession) return
+    
+    // 根据当前步骤跳转到对应页面
+    const stepRoutes = {
+      2: '/initial',
+      3: '/universal',
+      4: '/universal',
+      5: '/diagnosis',
+      6: '/diagnosis',
+      7: '/personalized'
+    }
+    
+    const targetRoute = stepRoutes[currentSession.currentStep as keyof typeof stepRoutes]
+    if (targetRoute) {
+      router.push(getPathWithLocale(targetRoute, locale))
+    }
+  }
+  
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
+      {/* Continue Session Banner */}
+      {showContinueBanner && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-40 w-full max-w-md"
+        >
+          <Card className="p-4 shadow-xl border-primary/50 bg-primary/5">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-sm font-medium">{tCommon('continueSession')}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  步骤 {currentSession?.currentStep}/7
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleContinueSession}>
+                  继续
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowContinueBanner(false)}
+                >
+                  ✕
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+      )}
+      
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}

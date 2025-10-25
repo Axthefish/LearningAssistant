@@ -8,6 +8,7 @@ import { useStore, useUserInput } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
+import { StepNavigator } from '@/components/StepNavigator'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
@@ -29,7 +30,7 @@ export default function InitialExtractionPage() {
   
   const missionStatement = useStore(state => state.session?.missionStatement)
   
-  const { content, isStreaming, sendMessage } = useChat({
+  const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
       setEditedContent(finalContent)
     },
@@ -51,7 +52,7 @@ export default function InitialExtractionPage() {
     if (!content && !isStreaming) {
       sendMessage('initial', {
         USER_INPUT: userInput.content,
-      })
+      }, locale)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -74,15 +75,19 @@ export default function InitialExtractionPage() {
   }
   
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header - Apple风格简洁导航 */}
-        <div className="flex items-center">
-          <Button variant="ghost" onClick={handleBack} className="rounded-xl">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="text-apple-body">{t('backButton')}</span>
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background">
+      {/* Step Navigator */}
+      <StepNavigator />
+      
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Header - Apple风格简洁导航 */}
+          <div className="flex items-center">
+            <Button variant="ghost" onClick={handleBack} className="rounded-xl">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              <span className="text-apple-body">{t('backButton')}</span>
+            </Button>
+          </div>
         
         {/* Title - Apple大标题 */}
         <div className="space-y-4 text-center">
@@ -100,6 +105,28 @@ export default function InitialExtractionPage() {
         
         {/* AI Thinking */}
         <ThinkingProcess isThinking={isStreaming} />
+        
+        {/* Stream Controls */}
+        {isStreaming && (
+          <Card className="p-4 flex items-center justify-between bg-muted/30">
+            <p className="text-sm text-muted-foreground">{tCommon('thinking')}</p>
+            <Button variant="outline" size="sm" onClick={abort}>
+              {tCommon('stop') || '停止生成'}
+            </Button>
+          </Card>
+        )}
+        
+        {/* Error State with Retry */}
+        {error && (
+          <Card className="p-4 bg-destructive/10 border-destructive/50">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-destructive">{error.message}</p>
+              <Button variant="outline" size="sm" onClick={retry}>
+                {tCommon('retry') || '重试'}
+              </Button>
+            </div>
+          </Card>
+        )}
         
         {/* AI Output */}
         {content && (
@@ -164,9 +191,10 @@ export default function InitialExtractionPage() {
                   )}
                 </div>
               )}
-            </Card>
-          </motion.div>
-        )}
+          </Card>
+        </motion.div>
+      )}
+        </div>
       </div>
     </div>
   )

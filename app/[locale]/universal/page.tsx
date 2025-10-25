@@ -8,11 +8,13 @@ import { useStore, useMissionStatement } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
+import { StepNavigator } from '@/components/StepNavigator'
 import { EnergyPillarSystemPro } from '@/components/3d/EnergyPillarSystemPro'
 import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parseUniversalFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { useToast } from '@/components/ui/use-toast'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
@@ -24,6 +26,7 @@ export default function UniversalFrameworkPage() {
   const tCommon = useTranslations('common')
   const router = useRouter()
   const locale = useLocale() as Locale
+  const { toast } = useToast()
   const missionStatement = useMissionStatement()
   const existingFramework = useStore(state => state.session?.universalFramework)
   const setUniversalFramework = useStore(state => state.setUniversalFramework)
@@ -35,7 +38,7 @@ export default function UniversalFrameworkPage() {
   const [isNavigating, setIsNavigating] = useState(false)
   const [markdownContent, setMarkdownContent] = useState('')
   
-  const { content, isStreaming, sendMessage } = useChat({
+  const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
       // 解析markdown为结构化数据
       const parsed = parseUniversalFramework(finalContent)
@@ -74,7 +77,7 @@ export default function UniversalFrameworkPage() {
     if (!content && !isStreaming) {
       sendMessage('universal', {
         FOKAL_POINT: missionStatement.content,
-      })
+      }, locale)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -87,6 +90,9 @@ export default function UniversalFrameworkPage() {
   
   return (
     <div className="h-screen flex flex-col bg-background">
+      {/* Step Navigator */}
+      <StepNavigator />
+      
       {/* Header */}
       <div className="border-b p-4">
         <div className="container mx-auto">
@@ -120,7 +126,11 @@ export default function UniversalFrameworkPage() {
         </div>
       </div>
       
-      {/* Main Content - 可调整大小的面板 */}
+      {/* Main Content - 可调整大小的面板 
+          注意：当前针对桌面优化。移动端建议：
+          - 使用 @media 检测小屏切为 direction="vertical"
+          - 或提供"切换视图"按钮在 Markdown/3D 间切换
+          - PanelResizeHandle 在触屏设备上增大命中区 */}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full">
           {/* Left: Markdown Content */}
@@ -150,6 +160,28 @@ export default function UniversalFrameworkPage() {
                   thinkingText="正在为你思考..."
                 />
                 
+                {/* Stream Controls */}
+                {isStreaming && (
+                  <Card className="p-4 flex items-center justify-between bg-muted/30">
+                    <p className="text-sm text-muted-foreground">{tCommon('thinking')}</p>
+                    <Button variant="outline" size="sm" onClick={abort}>
+                      {tCommon('stop')}
+                    </Button>
+                  </Card>
+                )}
+                
+                {/* Error State with Retry */}
+                {error && (
+                  <Card className="p-4 bg-destructive/10 border-destructive/50">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-destructive">{error.message}</p>
+                      <Button variant="outline" size="sm" onClick={retry}>
+                        {tCommon('retry')}
+                      </Button>
+                    </div>
+                  </Card>
+                )}
+                
                 {(content || markdownContent) && (
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -159,7 +191,10 @@ export default function UniversalFrameworkPage() {
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(content || markdownContent)
-                          alert(tCommon('copied'))
+                          toast({
+                            title: tCommon('copied'),
+                            duration: 2000,
+                          })
                         }}
                         className="absolute top-6 right-6 px-3 py-1.5 text-xs bg-secondary hover:bg-secondary/80 rounded-lg transition-colors z-10 shadow-sm"
                       >

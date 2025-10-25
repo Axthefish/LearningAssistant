@@ -63,6 +63,8 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
   const animationFrameRef = useRef<number>(0)
   const raycasterRef = useRef<THREE.Raycaster>(new THREE.Raycaster())
   const mouseRef = useRef<THREE.Vector2>(new THREE.Vector2())
+  const isVisibleRef = useRef<boolean>(true)
+  const lastUpdateTimeRef = useRef<number>(0)
   
   const [hoveredPillar, setHoveredPillar] = useState<string | null>(null)
   const [focusedPillar, setFocusedPillar] = useState<string | null>(null)
@@ -77,6 +79,29 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
   const [sidebarOpen, setSidebarOpen] = useState(showSidebar)
   const [tipsOpen, setTipsOpen] = useState(true)
   
+  // ============ 性能分档检测 ============
+  const getPerformanceTier = () => {
+    // 检测设备性能
+    const cores = navigator.hardwareConcurrency || 4
+    const memory = (navigator as any).deviceMemory || 4
+    const pixelRatio = window.devicePixelRatio || 1
+    
+    // 检测 prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    
+    if (prefersReducedMotion) {
+      return 'low' // 用户偏好减少动效
+    }
+    
+    if (cores >= 8 && memory >= 8 && pixelRatio <= 2) {
+      return 'high'
+    } else if (cores >= 4 && memory >= 4) {
+      return 'medium'
+    } else {
+      return 'low'
+    }
+  }
+  
   // ============ 主场景初始化 ============
   useEffect(() => {
     if (!containerRef.current) return
@@ -85,6 +110,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     const pillars = pillarsRef.current
     const spheres = spheresRef.current
     const particleTrails = particleTrailsRef.current
+    const performanceTier = getPerformanceTier()
     
     // 场景
     const scene = new THREE.Scene()
@@ -111,10 +137,18 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     
     const starTexture = new THREE.CanvasTexture(starCanvas)
     
+    // 根据性能分档调整星点数量
+    const starCounts = {
+      high: { far: 3000, mid: 800, near: 300 },
+      medium: { far: 1500, mid: 400, near: 150 },
+      low: { far: 500, mid: 200, near: 100 }
+    }
+    const counts = starCounts[performanceTier]
+    
     // 第一层：远处的小星星（密集背景）
     const farStarsGeo = new THREE.BufferGeometry()
     const farStarsPos = []
-    for (let i = 0; i < 3000; i++) {
+    for (let i = 0; i < counts.far; i++) {
       farStarsPos.push(
         (Math.random() - 0.5) * 150,
         (Math.random() - 0.5) * 150,
@@ -137,7 +171,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     // 第二层：中距离的星星（白色，较大）
     const midStarsGeo = new THREE.BufferGeometry()
     const midStarsPos = []
-    for (let i = 0; i < 800; i++) {
+    for (let i = 0; i < counts.mid; i++) {
       midStarsPos.push(
         (Math.random() - 0.5) * 100,
         (Math.random() - 0.5) * 100,
@@ -160,7 +194,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     // 第三层：近处的明亮星星（白色，大而亮）
     const nearStarsGeo = new THREE.BufferGeometry()
     const nearStarsPos = []
-    for (let i = 0; i < 300; i++) {
+    for (let i = 0; i < counts.near; i++) {
       nearStarsPos.push(
         (Math.random() - 0.5) * 80,
         (Math.random() - 0.5) * 80,
@@ -183,7 +217,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     // 保存星空图层用于动画
     const starLayers = { far: farStars, mid: midStars, near: nearStars }
     
-    console.log('✅ Round stars created: far(3000) + mid(800) + near(300) = 4100 stars')
+    console.log(`✅ Stars created (${performanceTier} tier): ${counts.far + counts.mid + counts.near} total`)
     
     // 相机
     const camera = new THREE.PerspectiveCamera(
@@ -204,7 +238,9 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
       powerPreference: 'high-performance',
     })
     renderer.setSize(container.clientWidth, container.clientHeight)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    // 根据性能分档限制 pixelRatio
+    const maxPixelRatio = performanceTier === 'high' ? 2 : performanceTier === 'medium' ? 1.5 : 1
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPixelRatio))
     renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1.2
     
@@ -434,24 +470,39 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     window.addEventListener('mousemove', onMouseMoveCamera)
     window.addEventListener('mouseup', onMouseUp)
     
+    // ============ 页面可见性检测 ============
+    const handleVisibilityChange = () => {
+      isVisibleRef.current = !document.hidden
+    }
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
     // ============ 动画循环 ============
     const animate = () => {
       animationFrameRef.current = requestAnimationFrame(animate)
       
+      // 如果页面不可见，跳过渲染
+      if (!isVisibleRef.current) {
+        return
+      }
+      
       const time = Date.now() * 0.001
       
-      // 星空缓慢旋转（增加深度感和动态）
-      if (starLayers.far) {
-        starLayers.far.rotation.y = time * 0.015
-        starLayers.far.rotation.x = time * 0.008
+      // 根据性能分档调整动画速度
+      const animationSpeed = performanceTier === 'high' ? 1 : performanceTier === 'medium' ? 0.7 : 0.4
+      
+      // 星空缓慢旋转（增加深度感和动态），根据性能分档调速
+      if (starLayers.far && performanceTier !== 'low') {
+        starLayers.far.rotation.y = time * 0.015 * animationSpeed
+        starLayers.far.rotation.x = time * 0.008 * animationSpeed
       }
-      if (starLayers.mid) {
-        starLayers.mid.rotation.y = time * 0.025
-        starLayers.mid.rotation.x = -time * 0.012
+      if (starLayers.mid && performanceTier !== 'low') {
+        starLayers.mid.rotation.y = time * 0.025 * animationSpeed
+        starLayers.mid.rotation.x = -time * 0.012 * animationSpeed
       }
       if (starLayers.near) {
-        starLayers.near.rotation.y = time * 0.035
-        starLayers.near.rotation.z = time * 0.005
+        starLayers.near.rotation.y = time * 0.035 * animationSpeed
+        starLayers.near.rotation.z = time * 0.005 * animationSpeed
       }
       
       // 星星闪烁效果（通过调整材质opacity）
@@ -511,6 +562,7 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
       cancelAnimationFrame(animationFrameRef.current)
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       container?.removeEventListener('mousedown', onMouseDown)
       window.removeEventListener('mousemove', onMouseMoveCamera)
       window.removeEventListener('mouseup', onMouseUp)
@@ -740,9 +792,18 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
     
     setInfoCards(cards)
     
-    // 动画循环更新卡片位置
+    // 动画循环更新卡片位置（节流优化）
+    let updateFrameId: number
     const updateCardPositions = () => {
       if (!focusedPillar || !cameraRef.current || !containerRef.current) return
+      
+      // 节流：仅当距离上次更新超过 100ms 时才更新
+      const now = Date.now()
+      if (now - lastUpdateTimeRef.current < 100) {
+        updateFrameId = requestAnimationFrame(updateCardPositions)
+        return
+      }
+      lastUpdateTimeRef.current = now
       
       const updatedCards: InfoCard[] = []
       const minGap = 15
@@ -803,19 +864,26 @@ export function EnergyPillarSystemPro({ data, onPillarClick, showSidebar = false
       }
       
       setInfoCards(updatedCards)
+      updateFrameId = requestAnimationFrame(updateCardPositions)
     }
     
-    // 每帧更新位置
-    const intervalId = setInterval(updateCardPositions, 50)
+    // 启动更新循环
+    updateFrameId = requestAnimationFrame(updateCardPositions)
     
     return () => {
-      clearInterval(intervalId)
+      cancelAnimationFrame(updateFrameId)
     }
   }, [focusedPillar])
   
   return (
     <div className="relative w-full h-full">
-      <div ref={containerRef} className="w-full h-full" />
+      <div 
+        ref={containerRef} 
+        className="w-full h-full" 
+        role="img" 
+        aria-label="3D visualization of your action framework pillars and connections"
+        tabIndex={0}
+      />
       
       {/* Tooltip */}
       {tooltip.visible && (

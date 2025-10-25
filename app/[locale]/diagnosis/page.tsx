@@ -13,6 +13,7 @@ import {
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
+import { StepNavigator } from '@/components/StepNavigator'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
@@ -40,7 +41,7 @@ export default function DiagnosisPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(true)
   
-  const { content, isStreaming, sendMessage } = useChat({
+  const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
       // 解析AI生成的诊断问题
       const parsed = parseDiagnosticQuestions(finalContent)
@@ -76,7 +77,7 @@ export default function DiagnosisPage() {
     sendMessage('diagnosis', {
       UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
       FOKAL_POINT: framework.systemGoal,
-    })
+    }, locale)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
@@ -125,8 +126,10 @@ export default function DiagnosisPage() {
   const allQuestionsAnswered = questions.every(q => answers[q.id]?.trim())
   
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <StepNavigator />
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
         {/* Progress - 简化版 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -256,6 +259,7 @@ export default function DiagnosisPage() {
             </motion.div>
           </AnimatePresence>
         )}
+        </div>
       </div>
     </div>
   )

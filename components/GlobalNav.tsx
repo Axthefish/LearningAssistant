@@ -15,6 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Menu, History, Home, Moon, Sun, Globe } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { SessionHistory } from './SessionHistory'
@@ -30,6 +38,8 @@ export function GlobalNav() {
   const { theme, setTheme } = useTheme()
   
   const [showHistory, setShowHistory] = useState(false)
+  const [showHomeDialog, setShowHomeDialog] = useState(false)
+  const [showNewSessionDialog, setShowNewSessionDialog] = useState(false)
   
   // 语言切换 - 使用原生 Next.js 路由
   const handleLanguageChange = (newLocale: Locale) => {
@@ -43,22 +53,28 @@ export function GlobalNav() {
   
   const handleGoHome = async () => {
     if (currentStep > 1) {
-      if (confirm('确定要返回首页吗？当前进度将被保存。')) {
-        const homePath = getPathWithLocale('/', locale)
-        router.push(homePath)
-      }
+      setShowHomeDialog(true)
     } else {
       const homePath = getPathWithLocale('/', locale)
       router.push(homePath)
     }
   }
   
+  const confirmGoHome = () => {
+    setShowHomeDialog(false)
+    const homePath = getPathWithLocale('/', locale)
+    router.push(homePath)
+  }
+  
   const handleNewSession = async () => {
-    if (confirm('确定要开始新会话吗？当前进度将被保存到历史记录。')) {
-      await resetSession()
-      const homePath = getPathWithLocale('/', locale)
-      router.push(homePath)
-    }
+    setShowNewSessionDialog(true)
+  }
+  
+  const confirmNewSession = async () => {
+    setShowNewSessionDialog(false)
+    await resetSession()
+    const homePath = getPathWithLocale('/', locale)
+    router.push(homePath)
   }
   
   return (
@@ -163,6 +179,46 @@ export function GlobalNav() {
           </div>
         </div>
       )}
+      
+      {/* Go Home Confirmation Dialog */}
+      <Dialog open={showHomeDialog} onOpenChange={setShowHomeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>返回首页</DialogTitle>
+            <DialogDescription>
+              确定要返回首页吗？当前进度将被保存，您可以稍后继续。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowHomeDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={confirmGoHome}>
+              确认返回
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* New Session Confirmation Dialog */}
+      <Dialog open={showNewSessionDialog} onOpenChange={setShowNewSessionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>开始新会话</DialogTitle>
+            <DialogDescription>
+              确定要开始新会话吗？当前进度将被保存到历史记录，您可以随时回顾。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewSessionDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={confirmNewSession}>
+              确认开始
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

@@ -13,6 +13,7 @@ import {
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
+import { StepNavigator } from '@/components/StepNavigator'
 import { EnergyPillarSystemPro } from '@/components/3d/EnergyPillarSystemPro'
 import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parsePersonalizedFramework } from '@/lib/markdown-parser'
@@ -39,7 +40,7 @@ export default function PersonalizedFrameworkPage() {
   const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
   const [isComplete, setIsComplete] = useState(false)
   
-  const { content, isStreaming, sendMessage } = useChat({
+  const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
       if (!framework) return
       
@@ -82,7 +83,7 @@ export default function PersonalizedFrameworkPage() {
       UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
       DIAGNOSTIC_POINTS_AND_QUESTIONS: '...', // TODO: 从store获取
       USER_ANSWERS: answersText,
-    })
+    }, locale)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
@@ -108,6 +109,7 @@ export default function PersonalizedFrameworkPage() {
   
   return (
     <div className="h-screen flex flex-col bg-background">
+      <StepNavigator />
       {/* Header */}
       <div className="border-b p-4">
         <div className="container mx-auto">
@@ -144,6 +146,28 @@ export default function PersonalizedFrameworkPage() {
                 isThinking={isStreaming}
                 thinkingText="正在整合你的答案，生成个性化建议..."
               />
+              
+              {/* Stream Controls */}
+              {isStreaming && (
+                <Card className="p-4 flex items-center justify-between bg-muted/30">
+                  <p className="text-sm text-muted-foreground">{tCommon('thinking')}</p>
+                  <Button variant="outline" size="sm" onClick={abort}>
+                    {tCommon('stop')}
+                  </Button>
+                </Card>
+              )}
+              
+              {/* Error State with Retry */}
+              {error && (
+                <Card className="p-4 bg-destructive/10 border-destructive/50">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-destructive">{error.message}</p>
+                    <Button variant="outline" size="sm" onClick={retry}>
+                      {tCommon('retry')}
+                    </Button>
+                  </div>
+                </Card>
+              )}
               
               {content && (
                 <motion.div

@@ -33,7 +33,10 @@ I propose we define our core mission as follows:
 Your current focus on [main area user emphasized] is solid. However, in similar contexts, it's also valuable to consider **[the dimension AI identified]**. Should we keep this in mind moving forward?
 
 ---
-How does this feel as our guiding mission? Getting this definition right is the most important step, as it will focus all of our subsequent analysis.`;
+How does this feel as our guiding mission? Getting this definition right is the most important step, as it will focus all of our subsequent analysis.
+
+**CRITICAL OUTPUT RULE**: Your final output must ONLY contain the user-facing content above. Do NOT expose any internal thought process, JSON objects, or Chain of Thought reasoning in your response. Present only the polished, narrative Mission Statement and Blind Spot sections.`;
+
 
 // 从 通用架构生成.md 提取
 export const UNIVERSAL_FRAMEWORK_PROMPT = `# Role: Dual Persona (Internal vs. External)
@@ -116,7 +119,10 @@ Adhere STRICTLY to the following Markdown structure. Do not add any text before 
 
 ### 🔁 Feedback Loop: [Render \`effect_name\` from Step 4]
 *   **Interaction**: \`[Module G]\` → \`[Module H]\` → \`[Module I]\` → ...
-*   **Result**: [Render \`explanation\` from Step 4]`;
+*   **Result**: [Render \`explanation\` from Step 4]
+
+**CRITICAL OUTPUT RULE**: Your final output must STRICTLY follow the Markdown structure above. Do NOT expose any internal JSON objects, analytical reasoning steps, or Chain of Thought process. Output ONLY the clean, user-ready Markdown.`;
+
 
 // 从 分析权重并向用户提问.md 提取
 export const DIAGNOSIS_PROMPT = `# Role: Dual Persona (Analyst -> Coach)
@@ -167,7 +173,10 @@ To build your personalized action plan, let's reflect on these specific areas:
 
 **1. [Render \`question\` related to Focus Area 1]**
 
-**2. [Render \`question\` related to Focus Area 2]**`;
+**2. [Render \`question\` related to Focus Area 2]**
+
+**CRITICAL OUTPUT RULE**: Output ONLY the structured diagnostic content above. Do NOT include any internal analytical objects, reasoning process, or meta-commentary. Present only the coach-style explanation and questions.`;
+
 
 // 从 特殊化架构生成.md 提取
 export const PERSONALIZED_PROMPT = `# Role: AI Personal Strategy Synthesizer
@@ -256,7 +265,10 @@ Use these tactics to maintain a global view and avoid tunnel vision during execu
 
 Your path to the next level is clear. Your foundational strengths are undeniable. By mastering your current opportunity zones—**[Summarize the core opportunity in one powerful phrase, e.g., systematically translating your technical value into visible business impact]**—you will unlock your unique professional superpower.
 
-The best part? You can start today. The single most impactful first step is to **[Reference the very first, most concrete recommendation, e.g., complete the "Three-Sentence Impact Template" for your last project]**. Taking this small action this week will be the key that unlocks a new way of communicating your value.`;
+The best part? You can start today. The single most impactful first step is to **[Reference the very first, most concrete recommendation, e.g., complete the "Three-Sentence Impact Template" for your last project]**. Taking this small action this week will be the key that unlocks a new way of communicating your value.
+
+**CRITICAL OUTPUT RULE**: Your final output must contain ONLY the user-facing personalized framework above. Do NOT expose any internal structured objects, insight derivation process, or analytical metadata. Present only the clean, motivational, action-ready content.`;
+
 
 // Domain Explorer Prompt - 帮助用户探索新领域
 export const DOMAIN_EXPLORER_PROMPT = `# Role: AI Domain Cartographer

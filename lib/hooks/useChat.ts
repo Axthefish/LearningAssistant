@@ -8,6 +8,11 @@ interface UseChatOptions {
   onError?: (error: Error) => void
 }
 
+export interface ChatController {
+  abort: () => void
+  retry: () => void
+}
+
 export function useChat(options: UseChatOptions = {}) {
   const [content, setContent] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
@@ -15,21 +20,29 @@ export function useChat(options: UseChatOptions = {}) {
   
   // 使用 ref 存储 options 避免依赖变化导致重新创建
   const optionsRef = useRef(options)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const lastRequestRef = useRef<{ promptType: PromptType; variables: Record<string, string>; locale?: string } | null>(null)
   
   useEffect(() => {
     optionsRef.current = options
   }, [options])
   
   const sendMessage = useCallback(
-    async (promptType: PromptType, variables: Record<string, string>) => {
+    async (promptType: PromptType, variables: Record<string, string>, locale?: string) => {
+      // 保存请求参数以支持重试
+      lastRequestRef.current = { promptType, variables, locale }
+      
       setContent('')
       setIsStreaming(true)
       setError(null)
       
+      // 创建新的 AbortController
+      abortControllerRef.current = new AbortController()
+      
       try {
-        // 自动添加当前语言到variables
-        const locale = localStorage.getItem('preferredLanguage') || 'en'
-        const languageName = locale === 'zh' ? 'Simplified Chinese' : 'English'
+        // 自动添加当前语言到variables - 优先使用传入的locale
+        const currentLocale = locale || (typeof window !== 'undefined' ? (window.location.pathname.startsWith('/zh') ? 'zh' : 'en') : 'en')
+        const languageName = currentLocale === 'zh' ? 'Simplified Chinese' : 'English'
         
         const response = await fetch('/api/chat', {
           method: 'POST',
@@ -41,6 +54,7 @@ export function useChat(options: UseChatOptions = {}) {
               LANGUAGE: languageName
             }
           }),
+          signal: abortControllerRef.current.signal,
         })
         
         if (!response.ok) {
@@ -70,6 +84,7 @@ export function useChat(options: UseChatOptions = {}) {
               
               if (data === '[DONE]') {
                 setIsStreaming(false)
+                abortControllerRef.current = null
                 optionsRef.current.onFinish?.(accumulatedContent)
                 return
               }
@@ -95,22 +110,47 @@ export function useChat(options: UseChatOptions = {}) {
         }
         
         setIsStreaming(false)
+        abortControllerRef.current = null
         optionsRef.current.onFinish?.(accumulatedContent)
       } catch (err) {
+        // 如果是用户主动取消，不报错
+        if (err instanceof Error && err.name === 'AbortError') {
+          setIsStreaming(false)
+          return
+        }
+        
         const error = err instanceof Error ? err : new Error('Unknown error')
         setError(error)
         setIsStreaming(false)
+        abortControllerRef.current = null
         optionsRef.current.onError?.(error)
       }
     },
     [] // 移除 options 依赖
   )
   
+  const abort = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+      setIsStreaming(false)
+    }
+  }, [])
+  
+  const retry = useCallback(() => {
+    if (lastRequestRef.current) {
+      const { promptType, variables, locale } = lastRequestRef.current
+      sendMessage(promptType, variables, locale)
+    }
+  }, [sendMessage])
+  
   return {
     content,
     isStreaming,
     error,
     sendMessage,
+    abort,
+    retry,
   }
 }
 

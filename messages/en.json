@@ -9,7 +9,12 @@
     "copied": "Copied to clipboard",
     "loading": "Loading...",
     "thinking": "Thinking for you...",
-    "organizing": "Organizing for you..."
+    "organizing": "Organizing for you...",
+    "stop": "Stop",
+    "retry": "Retry",
+    "regenerate": "Regenerate",
+    "cancel": "Cancel",
+    "continueSession": "Continue last session"
   },
   "nav": {
     "home": "Home",
@@ -74,7 +79,12 @@
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",
-    "timeout": "Request timeout. Please try again."
+    "timeout": "Request timeout. Please try again.",
+    "empty": {
+      "title": "No content yet",
+      "description": "There's no content to display at the moment",
+      "action": "Go back"
+    }
   }
 }
 
