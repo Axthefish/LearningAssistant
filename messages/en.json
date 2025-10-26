@@ -49,7 +49,7 @@
     "title": "Your Growth Blueprint",
     "subtitle": "Based on your goal, we've outlined a clear action path for you",
     "contextTitle": "🗺️ Why Do You Need to See the Big Picture?",
-    "contextBody": "Most people tend to focus on just one point, but <strong>{systemName}</strong> is actually a system",
+    "contextBody": "Most people tend to focus on just one point, but {systemName} is actually a system",
     "contextPoints": {
       "pillars": "See all pillars",
       "interactions": "Understand interactions",

@@ -49,7 +49,7 @@
     "title": "你的成长蓝图",
     "subtitle": "基于你的目标，我们为你梳理了清晰的行动路径",
     "contextTitle": "🗺️ 为什么需要看全局？",
-    "contextBody": "很多人容易只盯一个点，但 <strong>{systemName}</strong> 其实是个系统",
+    "contextBody": "很多人容易只盯一个点，但 {systemName} 其实是个系统",
     "contextPoints": {
       "pillars": "看清所有支柱",
       "interactions": "理解相互影响",

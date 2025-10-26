@@ -141,12 +141,11 @@ export default function UniversalFrameworkPage() {
                 {energyPillarData && (
                   <Card className="p-6 bg-blue-50/50 dark:bg-blue-950/20 border-blue-200/50">
                     <h3 className="text-lg font-semibold mb-3">{t('contextTitle')}</h3>
-                    <p 
-                      className="text-sm text-muted-foreground mb-3"
-                      dangerouslySetInnerHTML={{
-                        __html: t('contextBody', { systemName: energyPillarData.metadata.systemName })
-                      }}
-                    />
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {t('contextBody', { 
+                        systemName: energyPillarData.metadata.systemName 
+                      })}
+                    </p>
                     <ul className="text-sm space-y-1 text-muted-foreground">
                       <li>• {t('contextPoints.pillars')}</li>
                       <li>• {t('contextPoints.interactions')}</li>
