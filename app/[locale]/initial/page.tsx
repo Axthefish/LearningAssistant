@@ -23,6 +23,7 @@ export default function InitialExtractionPage() {
   const userInput = useUserInput()
   const setMissionStatement = useStore(state => state.setMissionStatement)
   const goToStep = useStore(state => state.goToStep)
+  const previousStep = useStore(state => state.previousStep)
   
   const [isEditing, setIsEditing] = useState(false)
   const [editedContent, setEditedContent] = useState('')
@@ -149,46 +150,55 @@ export default function InitialExtractionPage() {
               )}
               
               {!isStreaming && (
-                <div className="flex items-center space-x-2 pt-4 border-t">
-                  {isEditing ? (
-                    <>
-                      <Button
-                        onClick={() => {
-                          setIsEditing(false)
-                          setEditedContent(content)
-                        }}
-                        variant="outline"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        onClick={() => setIsEditing(false)}
-                      >
-                        {tCommon('save')}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        onClick={() => {
-                          setIsEditing(true)
-                          setEditedContent(content)
-                        }}
-                        variant="outline"
-                      >
-                        <Edit2 className="w-4 h-4 mr-2" />
-                        {t('editButton')}
-                      </Button>
-                      <Button
-                        onClick={handleConfirm}
-                        disabled={isConfirmed}
-                      >
-                        <Check className="w-4 h-4 mr-2" />
-                        {t('confirmAndContinue')}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </>
-                  )}
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <Button
+                    onClick={() => previousStep()}
+                    variant="outline"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    {tCommon('previous')}
+                  </Button>
+                  <div className="flex items-center space-x-2">
+                    {isEditing ? (
+                      <>
+                        <Button
+                          onClick={() => {
+                            setIsEditing(false)
+                            setEditedContent(content)
+                          }}
+                          variant="outline"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => setIsEditing(false)}
+                        >
+                          {tCommon('save')}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          onClick={() => {
+                            setIsEditing(true)
+                            setEditedContent(content)
+                          }}
+                          variant="outline"
+                        >
+                          <Edit2 className="w-4 h-4 mr-2" />
+                          {t('editButton')}
+                        </Button>
+                        <Button
+                          onClick={handleConfirm}
+                          disabled={isConfirmed}
+                        >
+                          <Check className="w-4 h-4 mr-2" />
+                          {t('confirmAndContinue')}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </div>
               )}
           </Card>

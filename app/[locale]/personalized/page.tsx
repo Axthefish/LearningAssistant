@@ -19,7 +19,7 @@ import { mapToEnergyPillarData } from '@/lib/3d-mapper'
 import { parsePersonalizedFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Download, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Download, RotateCcw } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { PersonalizedFramework } from '@/lib/types'
 import type { EnergyPillarData } from '@/lib/3d-mapper'
@@ -35,6 +35,7 @@ export default function PersonalizedFrameworkPage() {
   
   const setPersonalizedFramework = useStore(state => state.setPersonalizedFramework)
   const resetSession = useStore(state => state.resetSession)
+  const previousStep = useStore(state => state.previousStep)
   
   const [parsedFramework, setParsedFramework] = useState<PersonalizedFramework | null>(null)
   const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
@@ -120,18 +121,29 @@ export default function PersonalizedFrameworkPage() {
                 {t('subtitle')}
               </p>
             </div>
-            {isComplete && (
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" onClick={handleExport}>
-                  <Download className="w-4 h-4 mr-2" />
-                  {t('exportButton')}
+            <div className="flex items-center space-x-2">
+              {!isComplete && (
+                <Button
+                  onClick={() => previousStep()}
+                  variant="outline"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  {tCommon('previous')}
                 </Button>
-                <Button onClick={handleStartNew}>
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  {t('newSessionButton')}
-                </Button>
-              </div>
-            )}
+              )}
+              {isComplete && (
+                <>
+                  <Button variant="outline" onClick={handleExport}>
+                    <Download className="w-4 h-4 mr-2" />
+                    {t('exportButton')}
+                  </Button>
+                  <Button onClick={handleStartNew}>
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    {t('newSessionButton')}
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

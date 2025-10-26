@@ -1,6 +1,7 @@
 {
   "common": {
     "back": "返回",
+    "previous": "上一步",
     "next": "下一步",
     "confirm": "确认",
     "edit": "编辑",

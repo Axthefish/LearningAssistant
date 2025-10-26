@@ -1,6 +1,7 @@
 {
   "common": {
     "back": "Back",
+    "previous": "Previous",
     "next": "Next",
     "confirm": "Confirm",
     "edit": "Edit",

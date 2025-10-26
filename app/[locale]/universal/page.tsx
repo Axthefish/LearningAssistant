@@ -15,7 +15,7 @@ import { parseUniversalFramework } from '@/lib/markdown-parser'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import type { UniversalFramework } from '@/lib/types'
@@ -31,6 +31,7 @@ export default function UniversalFrameworkPage() {
   const existingFramework = useStore(state => state.session?.universalFramework)
   const setUniversalFramework = useStore(state => state.setUniversalFramework)
   const confirmPersonalization = useStore(state => state.confirmPersonalization)
+  const previousStep = useStore(state => state.previousStep)
   
   const [parsedFramework, setParsedFramework] = useState<UniversalFramework | null>(null)
   const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
@@ -103,25 +104,35 @@ export default function UniversalFrameworkPage() {
                 {t('subtitle')}
               </p>
             </div>
-            {showConfirmation && (
-              <Button 
-                onClick={handleConfirmPersonalization} 
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => previousStep()}
+                variant="outline"
                 size="lg"
-                disabled={isNavigating}
               >
-                {isNavigating ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    {t('preparing')}
-                  </>
-                ) : (
-                  <>
-                    {t('customizeButton')}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </>
-                )}
+                <ArrowLeft className="w-5 h-5 mr-2" />
+                {tCommon('previous')}
               </Button>
-            )}
+              {showConfirmation && (
+                <Button 
+                  onClick={handleConfirmPersonalization} 
+                  size="lg"
+                  disabled={isNavigating}
+                >
+                  {isNavigating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      {t('preparing')}
+                    </>
+                  ) : (
+                    <>
+                      {t('customizeButton')}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

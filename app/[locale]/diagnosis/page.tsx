@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { ArrowRight, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { DiagnosticQuestion as DiagnosticQuestionType, UserAnswer } from '@/lib/types'
 import { parseDiagnosticQuestions } from '@/lib/markdown-parser'
@@ -35,6 +35,7 @@ export default function DiagnosisPage() {
   const setDiagnosticQuestions = useStore(state => state.setDiagnosticQuestions)
   const addUserAnswer = useStore(state => state.addUserAnswer)
   const goToStep = useStore(state => state.goToStep)
+  const previousStep = useStore(state => state.previousStep)
   
   const [questions, setQuestions] = useState<DiagnosticQuestionType[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -238,21 +239,30 @@ export default function DiagnosisPage() {
                     ))}
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    {currentQuestionIndex < questions.length - 1 ? (
-                      <Button onClick={handleNext}>
-                        下一个问题
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={handleSubmitAll}
-                        disabled={!allQuestionsAnswered}
-                      >
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        完成，生成个性化方案
-                      </Button>
-                    )}
+                  <div className="flex items-center justify-between w-full">
+                    <Button
+                      onClick={() => previousStep()}
+                      variant="outline"
+                    >
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      {tCommon('previous')}
+                    </Button>
+                    <div className="flex items-center space-x-2">
+                      {currentQuestionIndex < questions.length - 1 ? (
+                        <Button onClick={handleNext}>
+                          下一个问题
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleSubmitAll}
+                          disabled={!allQuestionsAnswered}
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          完成，生成个性化方案
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Card>
