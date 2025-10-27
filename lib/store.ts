@@ -165,6 +165,7 @@ export const useStore = create<AppState>()(
           // 如果使命内容或语言变更，清理后续步骤数据，避免旧数据串场
           universalFramework: missionChanged ? undefined : session.universalFramework,
           diagnosticQuestions: missionChanged ? undefined : session.diagnosticQuestions,
+          diagnosticRawMarkdown: missionChanged ? undefined : session.diagnosticRawMarkdown,
           userAnswers: missionChanged ? undefined : session.userAnswers,
           personalizedFramework: missionChanged ? undefined : session.personalizedFramework,
           updatedAt: Date.now(),

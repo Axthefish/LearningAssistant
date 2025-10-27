@@ -95,6 +95,12 @@
     "step5": "Diagnosis",
     "step6": "Deep Dive",
     "step7": "Action Plan"
+  },
+  "sessionHistory": {
+    "title": "Session History",
+    "empty": "No sessions yet",
+    "newSession": "New Session",
+    "step": "Step {current}/{total}"
   }
 }
 

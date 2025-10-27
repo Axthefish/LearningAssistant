@@ -95,6 +95,12 @@
     "step5": "诊断分析",
     "step6": "深度提问",
     "step7": "个性化方案"
+  },
+  "sessionHistory": {
+    "title": "历史会话",
+    "empty": "暂无历史会话",
+    "newSession": "新会话",
+    "step": "步骤 {current}/{total}"
   }
 }
 

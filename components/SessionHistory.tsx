@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { storage } from '@/lib/storage'
 import type { Session } from '@/lib/types'
 import type { Locale } from '@/i18n/routing'
@@ -17,6 +17,7 @@ import { Clock, Trash2 } from 'lucide-react'
 
 export function SessionHistory() {
   const locale = useLocale() as Locale
+  const t = useTranslations('sessionHistory')
   const [sessions, setSessions] = useState<Session[]>([])
   const loadSession = useStore(state => state.loadSession)
   const currentSession = useStore(state => state.session)
@@ -41,15 +42,16 @@ export function SessionHistory() {
   }
   
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('zh-CN')
+    const localeString = locale === 'zh' ? 'zh-CN' : 'en-US'
+    return new Date(timestamp).toLocaleString(localeString)
   }
   
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">历史会话</h2>
+      <h2 className="text-2xl font-bold">{t('title')}</h2>
       
       {sessions.length === 0 ? (
-        <p className="text-muted-foreground">暂无历史会话</p>
+        <p className="text-muted-foreground">{t('empty')}</p>
       ) : (
         <div className="space-y-2">
           {sessions.map(session => (
@@ -65,13 +67,13 @@ export function SessionHistory() {
                   onClick={() => handleLoadSession(session.id)}
                 >
                   <div className="font-medium">
-                    {session.missionStatement?.content.slice(0, 100) || '新会话'}
+                    {session.missionStatement?.content.slice(0, 100) || t('newSession')}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-1">
                     <Clock className="w-4 h-4" />
                     <span>{formatDate(session.updatedAt)}</span>
                     <span>•</span>
-                    <span>步骤 {session.currentStep}/7</span>
+                    <span>{t('step', { current: session.currentStep, total: 7 })}</span>
                   </div>
                 </div>
                 
