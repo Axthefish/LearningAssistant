@@ -26,9 +26,10 @@ export default function HomePage() {
   
   // 清理可能导致路由问题的旧数据
   useEffect(() => {
-    // 检查并清理旧的localStorage数据结构（支持新旧两种键名）
+    // 检查并清理旧的localStorage数据结构（支持新旧两种键名 + 按语言隔离的新键）
     const oldKey = 'learning-assistant-current-session'
     const newKey = 'learning-assistant:current-session'
+    const localizedNewKey = `learning-assistant:current-session:${locale}`
     
     const checkAndClean = (key: string) => {
       const data = localStorage.getItem(key)
@@ -49,6 +50,7 @@ export default function HomePage() {
     
     checkAndClean(oldKey)
     checkAndClean(newKey)
+    checkAndClean(localizedNewKey)
     
     // 检查是否有未完成的会话
     if (currentSession && currentSession.currentStep > 1 && currentSession.currentStep < 7) {
