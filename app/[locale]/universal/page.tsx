@@ -64,8 +64,8 @@ export default function UniversalFrameworkPage() {
       return
     }
     
-    // 如果已有框架，直接使用，避免重复调用AI
-    if (existingFramework) {
+    // 如果已有框架但语言不一致，忽略旧缓存并重新请求
+    if (existingFramework && (existingFramework as any).language === locale) {
       setParsedFramework(existingFramework)
       const pillarData = mapToEnergyPillarData(existingFramework)
       setEnergyPillarData(pillarData)

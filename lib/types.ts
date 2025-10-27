@@ -13,6 +13,7 @@ export interface MissionStatement {
   blindSpot?: string // 新增：潜在盲区提示
   confirmed: boolean
   timestamp: number
+  language?: 'en' | 'zh'
 }
 
 export interface UniversalFramework {
@@ -22,6 +23,7 @@ export interface UniversalFramework {
   dynamics: SystemDynamics
   rawMarkdown: string
   timestamp: number
+  language?: 'en' | 'zh'
 }
 
 export interface Module {

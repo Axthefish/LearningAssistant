@@ -58,8 +58,8 @@ export default function DiagnosisPage() {
       return
     }
     
-    // 如果已有问题，直接使用
-    if (existingQuestions && existingQuestions.length > 0) {
+    // 如果已有问题但与当前语言或框架不一致则重新生成
+    if (existingQuestions && existingQuestions.length > 0 && (framework as any).language === locale) {
       setQuestions(existingQuestions)
       setIsGeneratingQuestions(false)
       

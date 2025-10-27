@@ -52,11 +52,9 @@ export default function HomePage() {
     checkAndClean(newKey)
     checkAndClean(localizedNewKey)
     
-    // 检查是否有未完成的会话
-    if (currentSession && currentSession.currentStep > 1 && currentSession.currentStep < 7) {
-      setShowContinueBanner(true)
-    }
-  }, [currentSession])
+    // 取消默认的“继续上次进度”提示（仅在本地显式需要时再打开）
+    setShowContinueBanner(false)
+  }, [currentSession, locale])
   
   const handleSubmit = async () => {
     if (!input.trim()) return

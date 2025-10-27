@@ -59,7 +59,7 @@ export default function InitialExtractionPage() {
   }, [])
   
   const handleConfirm = async () => {
-    const finalContent = isEditing ? editedContent : content
+    const finalContent = (isEditing ? editedContent : content) || ''
     
     // 保存Mission Statement
     await setMissionStatement(finalContent, true)

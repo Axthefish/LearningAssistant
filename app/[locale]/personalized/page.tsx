@@ -65,8 +65,8 @@ export default function PersonalizedFrameworkPage() {
       return
     }
     
-    // 如果已有个性化框架，直接展示
-    if (storedPersonalized) {
+    // 如果已有个性化框架，但语言不一致则忽略旧缓存
+    if (storedPersonalized && (storedPersonalized as any).language === locale) {
       setParsedFramework(storedPersonalized)
       const pillarData = mapToEnergyPillarData(storedPersonalized)
       setEnergyPillarData(pillarData)

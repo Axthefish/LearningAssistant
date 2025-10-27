@@ -151,13 +151,22 @@ export const useStore = create<AppState>()(
         const { session } = get()
         if (!session) return
         
+        const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
+        const missionChanged = content !== session.missionStatement?.content || currentLocale !== session.missionStatement?.language
+        
         const updatedSession: Session = {
           ...session,
           missionStatement: {
             content,
             confirmed,
             timestamp: Date.now(),
+            language: currentLocale,
           },
+          // 如果使命内容或语言变更，清理后续步骤数据，避免旧数据串场
+          universalFramework: missionChanged ? undefined : session.universalFramework,
+          diagnosticQuestions: missionChanged ? undefined : session.diagnosticQuestions,
+          userAnswers: missionChanged ? undefined : session.userAnswers,
+          personalizedFramework: missionChanged ? undefined : session.personalizedFramework,
           updatedAt: Date.now(),
         }
         
@@ -170,9 +179,14 @@ export const useStore = create<AppState>()(
         const { session } = get()
         if (!session) return
         
+        const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
         const updatedSession: Session = {
           ...session,
-          universalFramework: framework,
+          universalFramework: { ...framework, language: currentLocale },
+          // 更新通用框架后，清理后续依赖它的数据
+          diagnosticQuestions: undefined,
+          userAnswers: undefined,
+          personalizedFramework: undefined,
           updatedAt: Date.now(),
         }
         
