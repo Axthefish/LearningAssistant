@@ -24,8 +24,19 @@ export function parseUniversalFramework(markdown: string): UniversalFramework {
   const systemNameMatch = markdown.match(/# Universal Action System: (.+)/)
   const systemName = systemNameMatch ? systemNameMatch[1].trim() : 'Unknown System'
   
-  // 提取系统目标（可能在第一段）
-  const systemGoal = systemName // 简化处理
+  // 提取系统目标：尝试从 systemName 中移除冗余部分，或使用 systemName 作为默认
+  // systemGoal 应该是用户的核心目标，而 systemName 可能包含装饰性文字（如 "The ... Flywheel"）
+  // 这里简单提取，如果 prompt 输出格式固定，可以更精准地正则匹配
+  let systemGoal = systemName
+  
+  // 尝试移除常见的装饰词（如 "The", "System", "Flywheel" 等）使其更接近目标陈述
+  systemGoal = systemGoal
+    .replace(/^The\s+/i, '')
+    .replace(/\s+(System|Framework|Flywheel|Model|Approach)$/i, '')
+    .trim()
+  
+  // 如果解析后为空，回退到原名
+  if (!systemGoal) systemGoal = systemName
   
   // 解析模块
   const modules: Module[] = []

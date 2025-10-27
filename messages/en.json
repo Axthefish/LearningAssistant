@@ -86,6 +86,15 @@
       "description": "There's no content to display at the moment",
       "action": "Go back"
     }
+  },
+  "stepNavigator": {
+    "step1": "Input",
+    "step2": "Mission",
+    "step3": "Framework",
+    "step4": "Personalize",
+    "step5": "Diagnosis",
+    "step6": "Deep Dive",
+    "step7": "Action Plan"
   }
 }
 

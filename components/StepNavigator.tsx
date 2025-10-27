@@ -1,21 +1,23 @@
 'use client'
 
 import { useCurrentStep } from '@/lib/store'
+import { useTranslations } from 'next-intl'
 import { Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-const steps = [
-  { number: 1, label: '输入需求' },
-  { number: 2, label: '明确目标' },
-  { number: 3, label: '通用框架' },
-  { number: 4, label: '个性化确认' },
-  { number: 5, label: '诊断分析' },
-  { number: 6, label: '深度提问' },
-  { number: 7, label: '个性化方案' },
-]
-
 export function StepNavigator() {
   const currentStep = useCurrentStep()
+  const t = useTranslations('stepNavigator')
+  
+  const steps = [
+    { number: 1, label: t('step1') },
+    { number: 2, label: t('step2') },
+    { number: 3, label: t('step3') },
+    { number: 4, label: t('step4') },
+    { number: 5, label: t('step5') },
+    { number: 6, label: t('step6') },
+    { number: 7, label: t('step7') },
+  ]
   
   return (
     <div className="w-full bg-card border-b py-4">

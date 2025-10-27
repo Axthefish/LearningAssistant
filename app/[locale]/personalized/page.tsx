@@ -76,13 +76,20 @@ export default function PersonalizedFrameworkPage() {
     
     // 构建用户答案文本
     const answersText = userAnswers
-      .map((a, i) => `**问题 ${i + 1}**: ${a.answer}`)
+      .map((a, i) => `**Question ${i + 1}**: ${a.answer}`)
       .join('\n\n')
+    
+    // 构建诊断上下文（获取诊断问题和 focus area）
+    const diagnosticQuestions = useStore.getState().session?.diagnosticQuestions || []
+    const diagnosticContext = diagnosticQuestions.map((q, i) => {
+      const answer = userAnswers.find(ua => ua.questionId === q.id)
+      return `### Focus Area ${i + 1}: ${q.coachTitle}\n**Why this matters**: ${q.coachExplanation}\n**Question**: ${q.question}\n**User Answer**: ${answer?.answer || '(No answer provided)'}`
+    }).join('\n\n---\n\n')
     
     // 调用AI生成个性化框架
     sendMessage('personalized', {
       UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
-      DIAGNOSTIC_POINTS_AND_QUESTIONS: '...', // TODO: 从store获取
+      DIAGNOSTIC_POINTS_AND_QUESTIONS: diagnosticContext || answersText,
       USER_ANSWERS: answersText,
     }, locale)
     // eslint-disable-next-line react-hooks/exhaustive-deps
