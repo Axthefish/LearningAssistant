@@ -165,7 +165,7 @@ export function parseUniversalFramework(markdown: string): UniversalFramework {
     }
   }
   
-  const feedbackMatch = markdown.match(/###\s*🔁\s*Feedback Loop:\s*([\s\S]+?)\n\s*\*\s*\*\*Interaction\*\*:\s*`(.+?)`\s*→\s*`(.+?)`\s*→\s*`(.+?)`/)
+  const feedbackMatch = markdown.match(/###\s*🔁\s*Feedback Loop:\s*([\s\S]+?)\n\s*\*\s*\*\*Interaction\*\*:\s*`(.+?)`\s*→\s*`(.+?)`\s*→\s*`(.+?)`(?:\s*→\s*\.\.\.)?[\s\S]*?\*\s*\*\*Result\*\*:\s*([\s\S]+?)(?=\n\*\*|$)/)
   if (feedbackMatch) {
     dynamics.feedbackLoop = {
       effectName: feedbackMatch[1].trim(),
@@ -174,7 +174,7 @@ export function parseUniversalFramework(markdown: string): UniversalFramework {
         feedbackMatch[3].trim(),
         feedbackMatch[4].trim()
       ],
-      explanation: feedbackMatch[0] // 简化处理
+      explanation: feedbackMatch[5] ? feedbackMatch[5].trim() : feedbackMatch[1].trim()
     }
   }
   

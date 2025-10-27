@@ -69,14 +69,20 @@ export function useChat(options: UseChatOptions = {}) {
         }
         
         let accumulatedContent = ''
+        let buffer = '' // 缓冲区：存储未处理完的不完整行
         
         while (true) {
           const { done, value } = await reader.read()
           
           if (done) break
           
-          const chunk = decoder.decode(value)
-          const lines = chunk.split('\n')
+          // 将新chunk追加到缓冲区
+          const chunk = decoder.decode(value, { stream: true })
+          buffer += chunk
+          
+          // 按行拆分，保留最后一个可能不完整的行
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || '' // 最后一行可能不完整，留在缓冲区
           
           for (const line of lines) {
             if (line.startsWith('data: ')) {
