@@ -100,6 +100,7 @@ export interface Session {
   missionStatement?: MissionStatement
   universalFramework?: UniversalFramework
   diagnosticQuestions?: DiagnosticQuestion[]
+  diagnosticRawMarkdown?: string // 新增：存储诊断阶段 AI 输出原始 Markdown
   userAnswers?: UserAnswer[]
   personalizedFramework?: PersonalizedFramework
 }

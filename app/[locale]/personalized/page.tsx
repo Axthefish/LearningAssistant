@@ -79,12 +79,17 @@ export default function PersonalizedFrameworkPage() {
       .map((a, i) => `**Question ${i + 1}**: ${a.answer}`)
       .join('\n\n')
     
-    // 构建诊断上下文（获取诊断问题和 focus area）
-    const diagnosticQuestions = useStore.getState().session?.diagnosticQuestions || []
-    const diagnosticContext = diagnosticQuestions.map((q, i) => {
-      const answer = userAnswers.find(ua => ua.questionId === q.id)
-      return `### Focus Area ${i + 1}: ${q.coachTitle}\n**Why this matters**: ${q.coachExplanation}\n**Question**: ${q.question}\n**User Answer**: ${answer?.answer || '(No answer provided)'}`
-    }).join('\n\n---\n\n')
+    // 优先使用诊断阶段的原始 Markdown 作为上下文（最完整）
+    const diagnosticRawMarkdown = useStore.getState().session?.diagnosticRawMarkdown
+    
+    // 如果没有原始 Markdown，回退到手动构建（兼容旧会话）
+    const diagnosticContext = diagnosticRawMarkdown || (() => {
+      const diagnosticQuestions = useStore.getState().session?.diagnosticQuestions || []
+      return diagnosticQuestions.map((q, i) => {
+        const answer = userAnswers.find(ua => ua.questionId === q.id)
+        return `### Focus Area ${i + 1}: ${q.coachTitle}\n**Why this matters**: ${q.coachExplanation}\n**Question**: ${q.question}\n**User Answer**: ${answer?.answer || '(No answer provided)'}`
+      }).join('\n\n---\n\n')
+    })()
     
     // 调用AI生成个性化框架
     sendMessage('personalized', {

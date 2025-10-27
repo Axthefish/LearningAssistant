@@ -47,7 +47,8 @@ export default function DiagnosisPage() {
       // 解析AI生成的诊断问题
       const parsed = parseDiagnosticQuestions(finalContent)
       setQuestions(parsed)
-      setDiagnosticQuestions(parsed)
+      // 保存问题和原始 Markdown 一起存储
+      setDiagnosticQuestions(parsed, finalContent)
       setIsGeneratingQuestions(false)
     },
   })
@@ -58,13 +59,16 @@ export default function DiagnosisPage() {
       return
     }
     
-    // 如果已有问题但与当前语言或框架不一致则重新生成
-    if (existingQuestions && existingQuestions.length > 0 && (framework as any).language === locale) {
+    // 检查框架语言是否与当前语言匹配
+    const frameworkLangMatches = (framework as any).language === locale
+    
+    // 如果已有问题且语言匹配，直接使用
+    if (existingQuestions && existingQuestions.length > 0 && frameworkLangMatches) {
       setQuestions(existingQuestions)
       setIsGeneratingQuestions(false)
       
-      // 恢复已有答案
-      if (existingAnswers) {
+      // 恢复已有答案（确保答案也来自同语言上下文）
+      if (existingAnswers && existingAnswers.length > 0) {
         const answersMap: Record<string, string> = {}
         existingAnswers.forEach(a => {
           answersMap[a.questionId] = a.answer
@@ -74,6 +78,7 @@ export default function DiagnosisPage() {
       return
     }
     
+    // 如果语言不匹配或没有问题，重新生成（这会自动覆盖旧的 userAnswers）
     // 调用AI生成诊断问题
     sendMessage('diagnosis', {
       UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,

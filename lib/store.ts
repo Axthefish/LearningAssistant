@@ -44,7 +44,7 @@ interface AppState {
   confirmPersonalization: () => Promise<void>
   
   // Actions - 步骤5-6: 诊断提问
-  setDiagnosticQuestions: (questions: DiagnosticQuestion[]) => Promise<void>
+  setDiagnosticQuestions: (questions: DiagnosticQuestion[], rawMarkdown?: string) => Promise<void>
   addUserAnswer: (answer: UserAnswer) => Promise<void>
   
   // Actions - 步骤7: 个性化框架
@@ -209,14 +209,18 @@ export const useStore = create<AppState>()(
         set({ session: updatedSession })
       },
       
-      // 设置诊断问题
-      setDiagnosticQuestions: async (questions: DiagnosticQuestion[]) => {
+      // 设置诊断问题（同时保存原始 Markdown）
+      setDiagnosticQuestions: async (questions: DiagnosticQuestion[], rawMarkdown?: string) => {
         const { session } = get()
         if (!session) return
         
         const updatedSession: Session = {
           ...session,
           diagnosticQuestions: questions,
+          diagnosticRawMarkdown: rawMarkdown,
+          // 清空旧答案（避免新问题复用旧答案）
+          userAnswers: undefined,
+          personalizedFramework: undefined,
           updatedAt: Date.now(),
         }
         

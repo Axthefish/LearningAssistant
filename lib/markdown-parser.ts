@@ -24,18 +24,29 @@ export function parseUniversalFramework(markdown: string): UniversalFramework {
   const systemNameMatch = markdown.match(/# Universal Action System: (.+)/)
   const systemName = systemNameMatch ? systemNameMatch[1].trim() : 'Unknown System'
   
-  // 提取系统目标：尝试从 systemName 中移除冗余部分，或使用 systemName 作为默认
-  // systemGoal 应该是用户的核心目标，而 systemName 可能包含装饰性文字（如 "The ... Flywheel"）
-  // 这里简单提取，如果 prompt 输出格式固定，可以更精准地正则匹配
-  let systemGoal = systemName
+  // 提取系统目标：优先从 Markdown 正文中提取（在标题后、Core Modules 前的段落）
+  // 如果没有，再从 systemName 移除装饰词
+  let systemGoal = ''
   
-  // 尝试移除常见的装饰词（如 "The", "System", "Flywheel" 等）使其更接近目标陈述
-  systemGoal = systemGoal
-    .replace(/^The\s+/i, '')
-    .replace(/\s+(System|Framework|Flywheel|Model|Approach)$/i, '')
-    .trim()
+  // 尝试匹配标题后、## Core Modules 前的第一个非空段落作为目标描述
+  const goalMatch = markdown.match(/# Universal Action System:[^\n]*\n+([\s\S]+?)(?=\n##|\n\*\*|$)/)
+  if (goalMatch) {
+    // 提取第一段，去除多余空格与换行
+    const firstParagraph = goalMatch[1].trim().split('\n')[0].trim()
+    if (firstParagraph && firstParagraph.length > 10 && firstParagraph.length < 300) {
+      systemGoal = firstParagraph
+    }
+  }
   
-  // 如果解析后为空，回退到原名
+  // 如果未能提取，回退到从 systemName 移除装饰词
+  if (!systemGoal) {
+    systemGoal = systemName
+      .replace(/^The\s+/i, '')
+      .replace(/\s+(System|Framework|Flywheel|Model|Approach)$/i, '')
+      .trim()
+  }
+  
+  // 如果仍为空，使用 systemName
   if (!systemGoal) systemGoal = systemName
   
   // 解析模块

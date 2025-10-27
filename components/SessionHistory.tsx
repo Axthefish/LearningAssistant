@@ -6,23 +6,27 @@
  */
 
 import { useEffect, useState } from 'react'
+import { useLocale } from 'next-intl'
 import { storage } from '@/lib/storage'
 import type { Session } from '@/lib/types'
+import type { Locale } from '@/i18n/routing'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Clock, Trash2 } from 'lucide-react'
 
 export function SessionHistory() {
+  const locale = useLocale() as Locale
   const [sessions, setSessions] = useState<Session[]>([])
   const loadSession = useStore(state => state.loadSession)
   const currentSession = useStore(state => state.session)
   
   useEffect(() => {
     loadSessions()
-  }, [])
+  }, [locale])
   
   const loadSessions = async () => {
+    // 只加载与当前语言匹配的会话（由于 storage 按 locale 隔离，自动过滤）
     const allSessions = await storage.listSessions()
     setSessions(allSessions.sort((a, b) => b.updatedAt - a.updatedAt))
   }
