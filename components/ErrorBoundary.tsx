@@ -58,7 +58,10 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/'}
+                onClick={() => {
+                  const isZh = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh')
+                  window.location.href = isZh ? '/zh' : '/en'
+                }}
                 className="w-full"
               >
                 返回首页
