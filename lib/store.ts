@@ -15,7 +15,6 @@ import type {
   DiagnosticQuestion,
   UserAnswer,
   PersonalizedFramework,
-  DomainExploration,
 } from './types'
 import { storage } from './storage'
 
@@ -32,8 +31,6 @@ interface AppState {
   createNewSession: () => Promise<void>
   loadSession: (id: string) => Promise<void>
   
-  // Actions - 探索阶段
-  setDomainExploration: (exploration: DomainExploration) => Promise<void>
   // Actions - 步骤1: 用户输入
   setUserInput: (input: string) => Promise<void>
   
@@ -131,38 +128,6 @@ export const useStore = create<AppState>()(
         }
       },
       
-      // 设置领域探索结果
-      setDomainExploration: async (exploration: DomainExploration) => {
-        const { session } = get()
-        if (!session) return
-
-        const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
-
-        const updatedSession: Session = {
-          ...session,
-          domainExploration: {
-            ...exploration,
-            language: currentLocale,
-          },
-          userInput: {
-            content: exploration.topic,
-            timestamp: Date.now(),
-          },
-          missionStatement: undefined,
-          universalFramework: undefined,
-          diagnosticQuestions: undefined,
-          diagnosticRawMarkdown: undefined,
-          userAnswers: undefined,
-          personalizedFramework: undefined,
-          personalizedRawMarkdown: undefined,
-          currentStep: 1,
-          updatedAt: Date.now(),
-        }
-
-        await storage.saveSession(updatedSession)
-        set({ session: updatedSession })
-      },
-      
       // 设置用户输入
       setUserInput: async (input: string) => {
         const { session } = get()
@@ -174,7 +139,6 @@ export const useStore = create<AppState>()(
             content: input,
             timestamp: Date.now(),
           },
-          domainExploration: session.domainExploration,
           missionStatement: undefined,
           universalFramework: undefined,
           diagnosticQuestions: undefined,
@@ -195,8 +159,6 @@ export const useStore = create<AppState>()(
         if (!session) return
         
         const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
-        const missionChanged = content !== session.missionStatement?.content || currentLocale !== session.missionStatement?.language
-        
         const updatedSession: Session = {
           ...session,
           missionStatement: {
@@ -205,13 +167,13 @@ export const useStore = create<AppState>()(
             timestamp: Date.now(),
             language: currentLocale,
           },
-          // 如果使命内容或语言变更，清理后续步骤数据，避免旧数据串场
-          universalFramework: missionChanged ? undefined : session.universalFramework,
-          diagnosticQuestions: missionChanged ? undefined : session.diagnosticQuestions,
-          diagnosticRawMarkdown: missionChanged ? undefined : session.diagnosticRawMarkdown,
-          userAnswers: missionChanged ? undefined : session.userAnswers,
-          personalizedFramework: missionChanged ? undefined : session.personalizedFramework,
-          personalizedRawMarkdown: missionChanged ? undefined : session.personalizedRawMarkdown,
+          // 确认使命后，强制刷新后续步骤，避免沿用旧缓存
+          universalFramework: undefined,
+          diagnosticQuestions: undefined,
+          diagnosticRawMarkdown: undefined,
+          userAnswers: undefined,
+          personalizedFramework: undefined,
+          personalizedRawMarkdown: undefined,
           updatedAt: Date.now(),
         }
         
@@ -365,7 +327,6 @@ export const useStore = create<AppState>()(
  */
 export const useCurrentStep = () => useStore(state => state.session?.currentStep || 1)
 export const useUserInput = () => useStore(state => state.session?.userInput)
-export const useDomainExploration = () => useStore(state => state.session?.domainExploration)
 export const useMissionStatement = () => useStore(state => state.session?.missionStatement)
 export const useUniversalFramework = () => useStore(state => state.session?.universalFramework)
 export const useDiagnosticQuestions = () => useStore(state => state.session?.diagnosticQuestions)

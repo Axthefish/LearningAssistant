@@ -88,7 +88,7 @@
     }
   },
   "stepNavigator": {
-    "step1": "Explore",
+    "step1": "Input",
     "step2": "Mission",
     "step3": "Framework",
     "step4": "Personalize",
@@ -103,34 +103,7 @@
     "step": "Step {current}/{total}",
     "download": "Export Markdown"
   },
-  "domain": {
-    "title": "Explore a New Domain",
-    "subtitle": "Let's sketch the lay of the land before we go deeper",
-    "inputPlaceholder": "What topic are you curious about right now?",
-    "startButton": "Map This Domain",
-    "loadingButton": "Mapping...",
-    "firstStep": "Ready to lock in your mission?",
-    "examplesTitle": "Need inspiration? Try one of these:",
-    "mapTitle": "Your Exploration Map",
-    "mapDescription": "Here's the high-level structure we just charted.",
-    "actions": {
-      "remap": "Remap this topic",
-      "proceed": "Define my mission",
-      "stop": "Stop" 
-    },
-    "emptyState": "Describe a topic and I'll generate a map for you."
-  },
-  "topic": {
-    "title": "Clarify Your Focus",
-    "subtitle": "Use the exploration map to explain what you're really trying to accomplish.",
-    "mapPreviewTitle": "Your Exploration Map",
-    "mapPreviewHint": "Need to adjust the topic? Head back and regenerate the map.",
-    "mapPreviewTopic": "Current focus: {topic}",
-    "backToDomain": "Adjust the exploration map",
-    "inputLabel": "What are you working on right now?",
-    "inputPlaceholder": "Share the specific challenge, context, and what would feel like real progress...",
-    "startButton": "Turn this into a mission",
-    "loadingButton": "Organizing..."
-  }
+  "domain": {},
+  "topic": {}
 }
 

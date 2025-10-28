@@ -8,13 +8,6 @@ export interface UserInput {
   timestamp: number
 }
 
-export interface DomainExploration {
-  topic: string
-  rawMarkdown: string
-  timestamp: number
-  language?: 'en' | 'zh'
-}
-
 export interface MissionStatement {
   content: string
   blindSpot?: string // 新增：潜在盲区提示
@@ -105,7 +98,6 @@ export interface Session {
   createdAt: number
   updatedAt: number
   currentStep: number
-  domainExploration?: DomainExploration
   userInput?: UserInput
   missionStatement?: MissionStatement
   universalFramework?: UniversalFramework

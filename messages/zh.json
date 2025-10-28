@@ -77,35 +77,8 @@
     "newSessionButton": "开始新会话",
     "loading": "正在生成你的个性化方案..."
   },
-  "domain": {
-    "title": "探索一个全新领域",
-    "subtitle": "先画出全景，再决定要走的方向",
-    "inputPlaceholder": "你最近想了解哪个主题？",
-    "startButton": "生成探索地图",
-    "loadingButton": "正在生成...",
-    "firstStep": "准备好进入使命定义了吗？",
-    "examplesTitle": "没灵感？可以试试这些：",
-    "mapTitle": "你的探索地图",
-    "mapDescription": "我们刚为你梳理出的整体结构。",
-    "actions": {
-      "remap": "重新生成这张地图",
-      "proceed": "去定义使命",
-      "stop": "停止"
-    },
-    "emptyState": "描述一个你想探索的主题，我会为你生成地图。"
-  },
-  "topic": {
-    "title": "进一步聚焦你的主题",
-    "subtitle": "利用探索地图，清晰描述你真正想达成的成果。",
-    "mapPreviewTitle": "你的探索地图",
-    "mapPreviewHint": "想调整主题？可以返回上一页重新生成。",
-    "mapPreviewTopic": "当前聚焦：{topic}",
-    "backToDomain": "返回调整探索地图",
-    "inputLabel": "你现在正在做什么？",
-    "inputPlaceholder": "描述具体挑战、所在情境，以及什么样的进展最有意义...",
-    "startButton": "整理成使命陈述",
-    "loadingButton": "整理中..."
-  },
+  "domain": {},
+  "topic": {},
   "errors": {
     "generic": "出错了，请重试",
     "network": "网络错误，请检查连接",
@@ -117,7 +90,7 @@
     }
   },
   "stepNavigator": {
-    "step1": "探索主题",
+    "step1": "输入需求",
     "step2": "明确目标",
     "step3": "通用框架",
     "step4": "个性化确认",
