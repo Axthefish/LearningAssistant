@@ -156,7 +156,7 @@ npm run test
 1. 推送代码到GitHub
 2. 在 [Vercel](https://vercel.com) 导入仓库
 3. 配置环境变量：
-   - `GOOGLE_GENERATIVE_AI_API_KEY`
+   - `Gemini_API_KEY`
 4. 部署完成！
 
 ### 其他平台
@@ -173,7 +173,7 @@ npm run test
 
 | 变量名 | 说明 | 必需 |
 |--------|------|------|
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API密钥 | ✅ |
+| `Gemini_API_KEY` | Gemini API密钥 | ✅ |
 
 ### Gemini配置
 
