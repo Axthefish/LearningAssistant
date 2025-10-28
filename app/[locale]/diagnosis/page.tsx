@@ -72,7 +72,7 @@ export default function DiagnosisPage() {
     if (!hasRequestedQuestions) {
       sendMessage('diagnosis', {
         UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
-        FOKAL_POINT: framework.systemGoal,
+        PURPOSE_STATEMENT: framework.systemGoal,
       }, locale)
       setHasRequestedQuestions(true)
     }

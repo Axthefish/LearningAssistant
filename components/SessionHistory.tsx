@@ -45,8 +45,8 @@ export function SessionHistory() {
   const handleDownloadMarkdown = useCallback((session: Session) => {
     const parts: string[] = []
 
-    if (session.missionStatement) {
-      parts.push(`## Mission Statement\n\n${session.missionStatement.content}`)
+    if (session.purposeStatement) {
+      parts.push(`## Purpose Statement\n\n${session.purposeStatement.content}`)
     }
 
     if (session.universalFramework?.rawMarkdown) {
@@ -126,7 +126,9 @@ export function SessionHistory() {
                   onClick={() => handleLoadSession(session.id)}
                 >
                   <div className="font-medium">
-                    {session.missionStatement?.content.slice(0, 100) || t('newSession')}
+                    {session.purposeStatement?.content
+                      ? session.purposeStatement.content.slice(0, 100)
+                      : t('newSession')}
                   </div>
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground mt-1">
                     <Clock className="w-4 h-4" />

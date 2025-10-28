@@ -10,11 +10,12 @@ import { devtools } from 'zustand/middleware'
 import type {
   Session,
   UserInput,
-  MissionStatement,
+  PurposeStatement,
   UniversalFramework,
   DiagnosticQuestion,
   UserAnswer,
   PersonalizedFramework,
+  PurposeContext,
 } from './types'
 import { storage } from './storage'
 
@@ -34,8 +35,8 @@ interface AppState {
   // Actions - 步骤1: 用户输入
   setUserInput: (input: string) => Promise<void>
   
-  // Actions - 步骤2: Mission Statement
-  setMissionStatement: (content: string, confirmed: boolean) => Promise<void>
+  // Actions - 步骤2: Purpose Statement
+  setPurposeStatement: (content: string, confirmed: boolean, context?: PurposeContext) => Promise<void>
   
   // Actions - 步骤3: 通用框架
   setUniversalFramework: (framework: UniversalFramework) => Promise<void>
@@ -139,7 +140,7 @@ export const useStore = create<AppState>()(
             content: input,
             timestamp: Date.now(),
           },
-          missionStatement: undefined,
+          purposeStatement: undefined,
           universalFramework: undefined,
           diagnosticQuestions: undefined,
           diagnosticRawMarkdown: undefined,
@@ -153,21 +154,22 @@ export const useStore = create<AppState>()(
         set({ session: updatedSession })
       },
       
-      // 设置Mission Statement
-      setMissionStatement: async (content: string, confirmed: boolean) => {
+      // 设置Purpose Statement
+      setPurposeStatement: async (content: string, confirmed: boolean, context?: PurposeContext) => {
         const { session } = get()
         if (!session) return
         
         const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
         const updatedSession: Session = {
           ...session,
-          missionStatement: {
+          purposeStatement: {
             content,
             confirmed,
             timestamp: Date.now(),
             language: currentLocale,
+            context,
           },
-          // 确认使命后，强制刷新后续步骤，避免沿用旧缓存
+          // 确认目的后，强制刷新后续步骤，避免沿用旧缓存
           universalFramework: undefined,
           diagnosticQuestions: undefined,
           diagnosticRawMarkdown: undefined,
@@ -327,7 +329,7 @@ export const useStore = create<AppState>()(
  */
 export const useCurrentStep = () => useStore(state => state.session?.currentStep || 1)
 export const useUserInput = () => useStore(state => state.session?.userInput)
-export const useMissionStatement = () => useStore(state => state.session?.missionStatement)
+export const usePurposeStatement = () => useStore(state => state.session?.purposeStatement)
 export const useUniversalFramework = () => useStore(state => state.session?.universalFramework)
 export const useDiagnosticQuestions = () => useStore(state => state.session?.diagnosticQuestions)
 export const useUserAnswers = () => useStore(state => state.session?.userAnswers)

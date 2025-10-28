@@ -21,7 +21,7 @@ export default function InitialExtractionPage() {
   const router = useRouter()
   const locale = useLocale() as Locale
   const userInput = useUserInput()
-  const setMissionStatement = useStore(state => state.setMissionStatement)
+  const setPurposeStatement = useStore(state => state.setPurposeStatement)
   const goToStep = useStore(state => state.goToStep)
   const previousStep = useStore(state => state.previousStep)
   
@@ -29,7 +29,7 @@ export default function InitialExtractionPage() {
   const [editedContent, setEditedContent] = useState('')
   const [isConfirmed, setIsConfirmed] = useState(false)
   
-  const missionStatement = useStore(state => state.session?.missionStatement)
+  const purposeStatement = useStore(state => state.session?.purposeStatement)
   
   const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
@@ -43,15 +43,15 @@ export default function InitialExtractionPage() {
       return
     }
     
-    // 如果已有Mission Statement，直接使用，避免重复调用AI
-    if (missionStatement?.content && !missionStatement.confirmed) {
-      setEditedContent(missionStatement.content)
+    // 如果已有 Purpose Statement，直接使用，避免重复调用AI
+    if (purposeStatement?.content && !purposeStatement.confirmed) {
+      setEditedContent(purposeStatement.content)
       return
     }
     
     // 只有在没有内容时才调用AI
     if (!content && !isStreaming) {
-      sendMessage('mission', {
+      sendMessage('purpose', {
         INITIAL_USER_INPUT: userInput.content,
       }, locale)
     }
@@ -61,8 +61,8 @@ export default function InitialExtractionPage() {
   const handleConfirm = async () => {
     const finalContent = (isEditing ? editedContent : content) || ''
     
-    // 保存Mission Statement
-    await setMissionStatement(finalContent, true)
+    // 保存 Purpose Statement
+    await setPurposeStatement(finalContent, true)
     await goToStep(3)
     
     setIsConfirmed(true)

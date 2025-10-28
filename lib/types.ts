@@ -8,12 +8,17 @@ export interface UserInput {
   timestamp: number
 }
 
-export interface MissionStatement {
+export interface PurposeContext {
+  blindSpot?: string
+  focusPrompt?: string
+}
+
+export interface PurposeStatement {
   content: string
-  blindSpot?: string // 新增：潜在盲区提示
   confirmed: boolean
   timestamp: number
   language?: 'en' | 'zh'
+  context?: PurposeContext
 }
 
 export interface UniversalFramework {
@@ -99,7 +104,7 @@ export interface Session {
   updatedAt: number
   currentStep: number
   userInput?: UserInput
-  missionStatement?: MissionStatement
+  purposeStatement?: PurposeStatement
   universalFramework?: UniversalFramework
   diagnosticQuestions?: DiagnosticQuestion[]
   diagnosticRawMarkdown?: string // 新增：存储诊断阶段 AI 输出原始 Markdown

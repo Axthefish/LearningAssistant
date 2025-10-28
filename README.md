@@ -64,7 +64,7 @@ npm run start
 - "想要系统地学习AI技术"
 
 ### 步骤 2: 确认目标
-AI会将你的想法提炼成清晰的使命陈述（Mission Statement），你可以：
+AI会将你的想法提炼成清晰的目的陈述（Purpose Statement），你可以：
 - 直接确认
 - 编辑修改
 - 重新生成

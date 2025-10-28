@@ -38,8 +38,8 @@
     }
   },
   "initial": {
-    "title": "Clarify Your Goal",
-    "subtitle": "Based on your thoughts, let's refine a clear mission together",
+    "title": "Clarify Your Purpose",
+    "subtitle": "Based on your thoughts, let's refine a clear purpose together",
     "yourThoughts": "Your Thoughts",
     "backButton": "Back",
     "editButton": "Edit",
@@ -89,7 +89,7 @@
   },
   "stepNavigator": {
     "step1": "Input",
-    "step2": "Mission",
+    "step2": "Purpose",
     "step3": "Framework",
     "step4": "Personalize",
     "step5": "Diagnosis",

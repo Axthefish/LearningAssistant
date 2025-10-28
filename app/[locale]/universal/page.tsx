@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { getPathWithLocale, type Locale } from '@/i18n/routing'
-import { useStore, useMissionStatement } from '@/lib/store'
+import { useStore, usePurposeStatement } from '@/lib/store'
 import { useChat } from '@/lib/hooks/useChat'
 import { StreamingMessage } from '@/components/chat/StreamingMessage'
 import { ThinkingProcess } from '@/components/chat/ThinkingProcess'
@@ -27,7 +27,7 @@ export default function UniversalFrameworkPage() {
   const router = useRouter()
   const locale = useLocale() as Locale
   const { toast } = useToast()
-  const missionStatement = useMissionStatement()
+  const purposeStatement = usePurposeStatement()
   const existingFramework = useStore(state => state.session?.universalFramework)
   const setUniversalFramework = useStore(state => state.setUniversalFramework)
   const confirmPersonalization = useStore(state => state.confirmPersonalization)
@@ -59,7 +59,7 @@ export default function UniversalFrameworkPage() {
   })
   
   useEffect(() => {
-    if (!missionStatement?.confirmed) {
+    if (!purposeStatement?.confirmed) {
       router.push(getPathWithLocale('/initial', locale))
       return
     }
@@ -77,7 +77,7 @@ export default function UniversalFrameworkPage() {
     // 只有在没有内容时才调用AI
     if (!content && !isStreaming) {
       sendMessage('universal', {
-        FOKAL_POINT: missionStatement.content,
+        PURPOSE_STATEMENT: purposeStatement.content,
       }, locale)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
