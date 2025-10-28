@@ -63,11 +63,11 @@ export default function HomePage() {
     
     // 保存用户输入
     await setUserInput(input)
-    await goToStep(2)
+    await goToStep(1)
     
-    // 跳转到步骤2
-    const initialPath = getPathWithLocale('/initial', locale)
-    router.push(initialPath)
+    // 跳转到探索步骤
+    const domainPath = getPathWithLocale('/domain', locale)
+    router.push(domainPath)
   }
   
   const examples = [
@@ -82,13 +82,14 @@ export default function HomePage() {
     
     // 根据当前步骤跳转到对应页面
     const stepRoutes = {
-      2: '/initial',
-      3: '/universal',
+      1: '/domain',
+      2: '/topic',
+      3: '/initial',
       4: '/universal',
       5: '/diagnosis',
       6: '/diagnosis',
       7: '/personalized'
-    }
+    } as const
     
     const targetRoute = stepRoutes[currentSession.currentStep as keyof typeof stepRoutes]
     if (targetRoute) {

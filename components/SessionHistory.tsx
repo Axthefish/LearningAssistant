@@ -13,7 +13,8 @@ import type { Locale } from '@/i18n/routing'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Clock, Trash2 } from 'lucide-react'
+import { Clock, Trash2, Download } from 'lucide-react'
+import { useCallback } from 'react'
 
 export function SessionHistory() {
   const locale = useLocale() as Locale
@@ -41,6 +42,64 @@ export function SessionHistory() {
     await loadSessions()
   }
   
+  const handleDownloadMarkdown = useCallback((session: Session) => {
+    const parts: string[] = []
+
+    if (session.missionStatement) {
+      parts.push(`## Mission Statement\n\n${session.missionStatement.content}`)
+    }
+
+    if (session.universalFramework?.rawMarkdown) {
+      parts.push(`---\n\n## Universal Action System\n\n${session.universalFramework.rawMarkdown}`)
+    }
+
+    if (session.diagnosticRawMarkdown) {
+      parts.push(`---\n\n## Diagnostic Questions\n\n${session.diagnosticRawMarkdown}`)
+    }
+
+    if (!session.diagnosticRawMarkdown && session.diagnosticQuestions?.length) {
+      const answersMap = new Map(session.userAnswers?.map(a => [a.questionId, a.answer]) || [])
+      const diagnosticMarkdown = session.diagnosticQuestions
+        .map((q, index) => {
+          const answer = answersMap.get(q.id) || ''
+          return `#### Focus Area ${index + 1}: ${q.coachTitle}` +
+            `\n* **Here's why this matters**: ${q.coachExplanation}` +
+            `\n**Question**: ${q.question}` +
+            (answer ? `\n**User Answer**: ${answer}` : '')
+        })
+        .join('\n\n')
+      parts.push(`---\n\n## Diagnostic Questions\n\n${diagnosticMarkdown}`)
+    }
+
+    if (session.personalizedRawMarkdown) {
+      parts.push(`---\n\n## Personalized Framework\n\n${session.personalizedRawMarkdown}`)
+    } else if (session.personalizedFramework?.rawMarkdown) {
+      parts.push(`---\n\n## Personalized Framework\n\n${session.personalizedFramework.rawMarkdown}`)
+    }
+
+    if (session.userAnswers?.length) {
+      const answersMarkdown = session.userAnswers
+        .map((answer, index) => `**Question ${index + 1}**\n${answer.answer}`)
+        .join('\n\n')
+      parts.push(`---\n\n## User Answers\n\n${answersMarkdown}`)
+    }
+
+    const finalMarkdown = parts.join('\n\n')
+
+    if (!finalMarkdown) {
+      alert('当前会话没有可导出的内容。')
+      return
+    }
+
+    const blob = new Blob([finalMarkdown], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${new Date(session.updatedAt).toISOString()}-learning-assistant.md`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [])
+
   const formatDate = (timestamp: number) => {
     const localeString = locale === 'zh' ? 'zh-CN' : 'en-US'
     return new Date(timestamp).toLocaleString(localeString)
@@ -77,16 +136,29 @@ export function SessionHistory() {
                   </div>
                 </div>
                 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleDeleteSession(session.id)
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <div className="flex items-center space-x-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDownloadMarkdown(session)
+                    }}
+                    title={t('download')}
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteSession(session.id)
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

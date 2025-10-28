@@ -51,8 +51,8 @@ export default function InitialExtractionPage() {
     
     // 只有在没有内容时才调用AI
     if (!content && !isStreaming) {
-      sendMessage('initial', {
-        USER_INPUT: userInput.content,
+      sendMessage('mission', {
+        INITIAL_USER_INPUT: userInput.content,
       }, locale)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

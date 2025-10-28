@@ -8,6 +8,13 @@ export interface UserInput {
   timestamp: number
 }
 
+export interface DomainExploration {
+  topic: string
+  rawMarkdown: string
+  timestamp: number
+  language?: 'en' | 'zh'
+}
+
 export interface MissionStatement {
   content: string
   blindSpot?: string // 新增：潜在盲区提示
@@ -31,6 +38,7 @@ export interface Module {
   coreIdea: string
   differentiator?: string
   keyActions: KeyAction[]
+  slug?: string
 }
 
 export interface KeyAction {
@@ -43,6 +51,7 @@ export interface SystemDynamics {
   tradeoff?: DynamicEffect
   dependency?: DynamicEffect
   feedbackLoop?: DynamicEffect
+  risk?: DynamicEffect
 }
 
 export interface DynamicEffect {
@@ -96,6 +105,7 @@ export interface Session {
   createdAt: number
   updatedAt: number
   currentStep: number
+  domainExploration?: DomainExploration
   userInput?: UserInput
   missionStatement?: MissionStatement
   universalFramework?: UniversalFramework
@@ -103,5 +113,6 @@ export interface Session {
   diagnosticRawMarkdown?: string // 新增：存储诊断阶段 AI 输出原始 Markdown
   userAnswers?: UserAnswer[]
   personalizedFramework?: PersonalizedFramework
+  personalizedRawMarkdown?: string
 }
 

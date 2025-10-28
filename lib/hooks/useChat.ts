@@ -21,7 +21,11 @@ export function useChat(options: UseChatOptions = {}) {
   // 使用 ref 存储 options 避免依赖变化导致重新创建
   const optionsRef = useRef(options)
   const abortControllerRef = useRef<AbortController | null>(null)
-  const lastRequestRef = useRef<{ promptType: PromptType; variables: Record<string, string>; locale?: string } | null>(null)
+  const lastRequestRef = useRef<{
+    promptType: PromptType
+    variables: Record<string, string>
+    locale?: string
+  } | null>(null)
   
   useEffect(() => {
     optionsRef.current = options

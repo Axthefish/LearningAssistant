@@ -40,6 +40,7 @@ export default function PersonalizedFrameworkPage() {
   const [parsedFramework, setParsedFramework] = useState<PersonalizedFramework | null>(null)
   const [energyPillarData, setEnergyPillarData] = useState<EnergyPillarData | null>(null)
   const [isComplete, setIsComplete] = useState(false)
+  const [finalMarkdown, setFinalMarkdown] = useState('')
   
   const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
@@ -55,6 +56,7 @@ export default function PersonalizedFrameworkPage() {
       
       // 保存到store
       setPersonalizedFramework(parsed)
+      setFinalMarkdown(finalContent)
       setIsComplete(true)
     },
   })
@@ -68,6 +70,7 @@ export default function PersonalizedFrameworkPage() {
     // 如果已有个性化框架，但语言不一致则忽略旧缓存
     if (storedPersonalized && (storedPersonalized as any).language === locale) {
       setParsedFramework(storedPersonalized)
+      setFinalMarkdown(storedPersonalized.rawMarkdown)
       const pillarData = mapToEnergyPillarData(storedPersonalized)
       setEnergyPillarData(pillarData)
       setIsComplete(true)
@@ -92,6 +95,7 @@ export default function PersonalizedFrameworkPage() {
     })()
     
     // 调用AI生成个性化框架
+    setFinalMarkdown('')
     sendMessage('personalized', {
       UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
       DIAGNOSTIC_POINTS_AND_QUESTIONS: diagnosticContext || answersText,
@@ -101,9 +105,10 @@ export default function PersonalizedFrameworkPage() {
   }, [])
   
   const handleExport = () => {
-    if (!content) return
+    const markdownToExport = finalMarkdown || content
+    if (!markdownToExport) return
     
-    const blob = new Blob([content], { type: 'text/markdown' })
+    const blob = new Blob([markdownToExport], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url

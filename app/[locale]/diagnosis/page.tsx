@@ -41,6 +41,7 @@ export default function DiagnosisPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [isGeneratingQuestions, setIsGeneratingQuestions] = useState(true)
+  const [hasRequestedQuestions, setHasRequestedQuestions] = useState(false)
   
   const { content, isStreaming, error, sendMessage, abort, retry } = useChat({
     onFinish: (finalContent) => {
@@ -59,33 +60,32 @@ export default function DiagnosisPage() {
       return
     }
     
-    // 检查框架语言是否与当前语言匹配
     const frameworkLangMatches = (framework as any).language === locale
+    const hasExistingQuestions = Boolean(existingQuestions && existingQuestions.length > 0 && frameworkLangMatches)
     
-    // 如果已有问题且语言匹配，直接使用
-    if (existingQuestions && existingQuestions.length > 0 && frameworkLangMatches) {
+    if (hasExistingQuestions && existingQuestions) {
       setQuestions(existingQuestions)
       setIsGeneratingQuestions(false)
-      
-      // 恢复已有答案（确保答案也来自同语言上下文）
-      if (existingAnswers && existingAnswers.length > 0) {
-        const answersMap: Record<string, string> = {}
-        existingAnswers.forEach(a => {
-          answersMap[a.questionId] = a.answer
-        })
-        setAnswers(answersMap)
-      }
       return
     }
     
-    // 如果语言不匹配或没有问题，重新生成（这会自动覆盖旧的 userAnswers）
-    // 调用AI生成诊断问题
-    sendMessage('diagnosis', {
-      UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
-      FOKAL_POINT: framework.systemGoal,
-    }, locale)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (!hasRequestedQuestions) {
+      sendMessage('diagnosis', {
+        UNIVERSAL_ACTION_SYSTEM: framework.rawMarkdown,
+        FOKAL_POINT: framework.systemGoal,
+      }, locale)
+      setHasRequestedQuestions(true)
+    }
+  }, [framework, existingQuestions, locale, router, sendMessage, hasRequestedQuestions])
+  
+  useEffect(() => {
+    if (!existingAnswers || existingAnswers.length === 0) return
+    const answersMap: Record<string, string> = {}
+    existingAnswers.forEach(a => {
+      answersMap[a.questionId] = a.answer
+    })
+    setAnswers(answersMap)
+  }, [existingAnswers])
   
   const currentQuestion = questions[currentQuestionIndex]
   const totalQuestions = questions.length
@@ -129,7 +129,12 @@ export default function DiagnosisPage() {
     router.push(getPathWithLocale('/personalized', locale))
   }
   
-  const allQuestionsAnswered = questions.every(q => answers[q.id]?.trim())
+  const allQuestionsAnswered = questions.every(q => {
+    const localAnswer = answers[q.id]?.trim()
+    if (localAnswer) return true
+    const storedAnswer = existingAnswers?.find(a => a.questionId === q.id)?.answer?.trim()
+    return Boolean(storedAnswer)
+  })
   
   return (
     <div className="min-h-screen bg-background">

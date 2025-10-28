@@ -15,6 +15,7 @@ import type {
   DiagnosticQuestion,
   UserAnswer,
   PersonalizedFramework,
+  DomainExploration,
 } from './types'
 import { storage } from './storage'
 
@@ -31,6 +32,8 @@ interface AppState {
   createNewSession: () => Promise<void>
   loadSession: (id: string) => Promise<void>
   
+  // Actions - 探索阶段
+  setDomainExploration: (exploration: DomainExploration) => Promise<void>
   // Actions - 步骤1: 用户输入
   setUserInput: (input: string) => Promise<void>
   
@@ -128,20 +131,60 @@ export const useStore = create<AppState>()(
         }
       },
       
+      // 设置领域探索结果
+      setDomainExploration: async (exploration: DomainExploration) => {
+        const { session } = get()
+        if (!session) return
+
+        const currentLocale: 'en' | 'zh' = typeof window !== 'undefined' && window.location.pathname.startsWith('/zh') ? 'zh' : 'en'
+
+        const updatedSession: Session = {
+          ...session,
+          domainExploration: {
+            ...exploration,
+            language: currentLocale,
+          },
+          userInput: {
+            content: exploration.topic,
+            timestamp: Date.now(),
+          },
+          missionStatement: undefined,
+          universalFramework: undefined,
+          diagnosticQuestions: undefined,
+          diagnosticRawMarkdown: undefined,
+          userAnswers: undefined,
+          personalizedFramework: undefined,
+          personalizedRawMarkdown: undefined,
+          currentStep: 1,
+          updatedAt: Date.now(),
+        }
+
+        await storage.saveSession(updatedSession)
+        set({ session: updatedSession })
+      },
+      
       // 设置用户输入
       setUserInput: async (input: string) => {
         const { session } = get()
         if (!session) return
-        
+
         const updatedSession: Session = {
           ...session,
           userInput: {
             content: input,
             timestamp: Date.now(),
           },
+          domainExploration: session.domainExploration,
+          missionStatement: undefined,
+          universalFramework: undefined,
+          diagnosticQuestions: undefined,
+          diagnosticRawMarkdown: undefined,
+          userAnswers: undefined,
+          personalizedFramework: undefined,
+          personalizedRawMarkdown: undefined,
           updatedAt: Date.now(),
         }
-        
+
         await storage.saveSession(updatedSession)
         set({ session: updatedSession })
       },
@@ -168,6 +211,7 @@ export const useStore = create<AppState>()(
           diagnosticRawMarkdown: missionChanged ? undefined : session.diagnosticRawMarkdown,
           userAnswers: missionChanged ? undefined : session.userAnswers,
           personalizedFramework: missionChanged ? undefined : session.personalizedFramework,
+          personalizedRawMarkdown: missionChanged ? undefined : session.personalizedRawMarkdown,
           updatedAt: Date.now(),
         }
         
@@ -188,6 +232,8 @@ export const useStore = create<AppState>()(
           diagnosticQuestions: undefined,
           userAnswers: undefined,
           personalizedFramework: undefined,
+          diagnosticRawMarkdown: undefined,
+          personalizedRawMarkdown: undefined,
           updatedAt: Date.now(),
         }
         
@@ -222,6 +268,7 @@ export const useStore = create<AppState>()(
           // 清空旧答案（避免新问题复用旧答案）
           userAnswers: undefined,
           personalizedFramework: undefined,
+          personalizedRawMarkdown: undefined,
           updatedAt: Date.now(),
         }
         
@@ -258,6 +305,7 @@ export const useStore = create<AppState>()(
         const updatedSession: Session = {
           ...session,
           personalizedFramework: framework,
+          personalizedRawMarkdown: framework.rawMarkdown,
           updatedAt: Date.now(),
         }
         
@@ -285,7 +333,7 @@ export const useStore = create<AppState>()(
         const { session } = get()
         if (!session) return
         
-        const nextStep = Math.min(session.currentStep + 1, 7)
+        const nextStep = Math.min(session.currentStep + 1, 8)
         await get().goToStep(nextStep)
       },
       
@@ -317,6 +365,7 @@ export const useStore = create<AppState>()(
  */
 export const useCurrentStep = () => useStore(state => state.session?.currentStep || 1)
 export const useUserInput = () => useStore(state => state.session?.userInput)
+export const useDomainExploration = () => useStore(state => state.session?.domainExploration)
 export const useMissionStatement = () => useStore(state => state.session?.missionStatement)
 export const useUniversalFramework = () => useStore(state => state.session?.universalFramework)
 export const useDiagnosticQuestions = () => useStore(state => state.session?.diagnosticQuestions)
