@@ -169,7 +169,7 @@ export const useStore = create<AppState>()(
             language: currentLocale,
             context,
           },
-          // 确认目的后，强制刷新后续步骤，避免沿用旧缓存
+          // 确认目标后，强制刷新后续步骤，避免沿用旧缓存
           universalFramework: undefined,
           diagnosticQuestions: undefined,
           diagnosticRawMarkdown: undefined,

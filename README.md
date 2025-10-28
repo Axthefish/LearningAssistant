@@ -64,7 +64,7 @@ npm run start
 - "想要系统地学习AI技术"
 
 ### 步骤 2: 确认目标
-AI会将你的想法提炼成清晰的目的陈述（Purpose Statement），你可以：
+AI会将你的想法提炼成清晰的目标陈述（Purpose Statement），你可以：
 - 直接确认
 - 编辑修改
 - 重新生成
@@ -109,7 +109,7 @@ AI会将你的想法提炼成清晰的目的陈述（Purpose Statement），你�
 ```
 ├── app/                      # Next.js App Router页面
 │   ├── page.tsx             # 步骤1: 用户输入
-│   ├── initial/             # 步骤2: 目的提取
+│   ├── initial/             # 步骤2: 目标提取
 │   ├── universal/           # 步骤3: 通用框架
 │   ├── diagnosis/           # 步骤5-6: 诊断提问
 │   ├── personalized/        # 步骤7: 个性化方案
