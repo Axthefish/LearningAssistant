@@ -1,208 +1,209 @@
 'use client'
 
 /**
- * Global Sidebar Component
- * 左侧固定导航栏，支持响应式
+ * 全局侧边栏组件 - 替代顶部导航栏
+ * 只包含有效的导航功能，无无效按钮
  */
 
-import { useState } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter as useNextRouter, usePathname as useNextPathname } from 'next/navigation'
 import { useLocale } from 'next-intl'
-import { useStore } from '@/lib/store'
-import { getPathWithLocale, type Locale } from '@/i18n/routing'
+import { useStore, useCurrentStep } from '@/lib/store'
 import { Button } from '@/components/ui/button'
-import { 
-  LayoutDashboard, 
-  Target, 
-  BookOpen, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X,
-  User,
-  Sparkles
-} from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-
-interface NavItem {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  path: string
-}
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Home, History, Globe, Sparkles, Plus } from 'lucide-react'
+import { SessionHistory } from './SessionHistory'
+import { useState } from 'react'
+import { getPathnameWithoutLocale, getPathWithLocale, type Locale } from '@/i18n/routing'
 
 export function Sidebar() {
-  const router = useRouter()
-  const pathname = usePathname()
+  const router = useNextRouter()
+  const pathname = useNextPathname()
   const locale = useLocale() as Locale
+  const currentStep = useCurrentStep()
   const resetSession = useStore(state => state.resetSession)
-  const [isOpen, setIsOpen] = useState(false)
   
-  // 导航菜单项
-  const navItems: NavItem[] = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: LayoutDashboard,
-      path: '/dashboard'
-    },
-    {
-      id: 'framework',
-      label: 'My Framework',
-      icon: Sparkles,
-      path: '/personalized'
-    },
-    {
-      id: 'goals',
-      label: 'Goals',
-      icon: Target,
-      path: '/universal'
-    },
-    {
-      id: 'resources',
-      label: 'Resources',
-      icon: BookOpen,
-      path: '#'
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      path: '#'
-    }
-  ]
-
-  const handleNavigation = (path: string) => {
-    if (path === '#') return
-    const fullPath = getPathWithLocale(path, locale)
-    router.push(fullPath)
-    setIsOpen(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [showHomeDialog, setShowHomeDialog] = useState(false)
+  const [showNewSessionDialog, setShowNewSessionDialog] = useState(false)
+  
+  // 语言切换
+  const handleLanguageChange = (newLocale: Locale) => {
+    const cleanPath = getPathnameWithoutLocale(pathname)
+    const newPath = getPathWithLocale(cleanPath, newLocale)
+    router.push(newPath)
   }
-
-  const handleLogout = async () => {
-    if (confirm('确定要登出吗？当前会话将被保存。')) {
-      await resetSession()
-      router.push(getPathWithLocale('/', locale))
+  
+  const handleGoHome = async () => {
+    if (currentStep > 1) {
+      setShowHomeDialog(true)
+    } else {
+      const homePath = getPathWithLocale('/', locale)
+      router.push(homePath)
     }
   }
-
-  const isActive = (path: string) => {
-    if (path === '#') return false
-    return pathname.includes(path)
+  
+  const confirmGoHome = () => {
+    setShowHomeDialog(false)
+    const homePath = getPathWithLocale('/', locale)
+    router.push(homePath)
   }
-
-  // Sidebar内容组件
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-card/50 backdrop-blur-xl border-r border-border/50">
-      {/* Logo & Brand */}
-      <div className="p-6 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-teal-amber flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold">Learning Assistant</h1>
-            <p className="text-xs text-muted-foreground">AI Coach</p>
-          </div>
-        </div>
-      </div>
-
-      {/* User Profile */}
-      <div className="p-6 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal to-amber flex items-center justify-center">
-            <User className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">Alex Chen</p>
-            <p className="text-sm text-muted-foreground truncate">Growth Journey</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const active = isActive(item.path)
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleNavigation(item.path)}
-              disabled={item.path === '#'}
-              className={`
-                w-full flex items-center gap-3 px-4 py-3 rounded-xl
-                transition-all duration-200
-                ${active 
-                  ? 'bg-primary text-primary-foreground shadow-lg' 
-                  : 'hover:bg-muted text-muted-foreground hover:text-foreground'
-                }
-                ${item.path === '#' ? 'opacity-50 cursor-not-allowed' : ''}
-              `}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
-            </button>
-          )
-        })}
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-border/50">
-        <Button
-          onClick={handleLogout}
-          variant="ghost"
-          className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Log Out</span>
-        </Button>
-      </div>
-    </div>
-  )
-
+  
+  const handleNewSession = async () => {
+    setShowNewSessionDialog(true)
+  }
+  
+  const confirmNewSession = async () => {
+    setShowNewSessionDialog(false)
+    await resetSession()
+    const homePath = getPathWithLocale('/', locale)
+    router.push(homePath)
+  }
+  
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-xl bg-card border border-border shadow-lg flex items-center justify-center"
-      >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block fixed left-0 top-0 bottom-0 w-64 z-40">
-        <SidebarContent />
+      {/* 固定左侧边栏 */}
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-card/50 backdrop-blur-xl border-r border-border/50 z-40 flex flex-col">
+        {/* Logo/Brand */}
+        <div className="p-6 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="font-bold text-lg">Learning Assistant</h1>
+              <p className="text-xs text-muted-foreground">将想法，变为行动</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* 导航菜单 */}
+        <nav className="flex-1 p-4 space-y-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={handleGoHome}
+          >
+            <Home className="w-5 h-5" />
+            <span>首页</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={() => setShowHistory(true)}
+          >
+            <History className="w-5 h-5" />
+            <span>历史记录</span>
+          </Button>
+          
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3"
+            onClick={handleNewSession}
+          >
+            <Plus className="w-5 h-5" />
+            <span>新会话</span>
+          </Button>
+        </nav>
+        
+        {/* 底部：语言切换 */}
+        <div className="p-4 border-t border-border/50">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full justify-start gap-3">
+                <Globe className="w-5 h-5" />
+                <span>{locale === 'zh' ? '简体中文' : 'English'}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" side="right">
+              <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                <span className={locale === 'en' ? 'font-semibold' : ''}>
+                  English
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleLanguageChange('zh')}>
+                <span className={locale === 'zh' ? 'font-semibold' : ''}>
+                  简体中文
+                </span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </aside>
-
-      {/* Mobile Sidebar */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
-              className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
-            />
-            
-            {/* Sidebar */}
-            <motion.aside
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 w-64 z-50"
-            >
-              <SidebarContent />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+      
+      {/* History Sidebar Overlay */}
+      {showHistory && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur">
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-card border-l shadow-lg overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">历史记录</h2>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowHistory(false)}
+                >
+                  ✕
+                </Button>
+              </div>
+              <SessionHistory />
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Go Home Confirmation Dialog */}
+      <Dialog open={showHomeDialog} onOpenChange={setShowHomeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>返回首页</DialogTitle>
+            <DialogDescription>
+              确定要返回首页吗？当前进度将被保存，您可以稍后继续。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowHomeDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={confirmGoHome}>
+              确认返回
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* New Session Confirmation Dialog */}
+      <Dialog open={showNewSessionDialog} onOpenChange={setShowNewSessionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>开始新会话</DialogTitle>
+            <DialogDescription>
+              确定要开始新会话吗？当前进度将被保存到历史记录，您可以随时回顾。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewSessionDialog(false)}>
+              取消
+            </Button>
+            <Button onClick={confirmNewSession}>
+              确认开始
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

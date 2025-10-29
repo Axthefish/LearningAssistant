@@ -1,8 +1,8 @@
 import {NextIntlClientProvider} from 'next-intl';
 import {getMessages} from 'next-intl/server';
 import { StoreInitializer } from "@/components/StoreInitializer";
-import { GlobalNav } from "@/components/GlobalNav";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { Sidebar } from "@/components/Sidebar";
+import { StarryBackground } from "@/components/StarryBackground";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Toaster } from "@/components/ui/toaster";
 import { locales } from '@/i18n/routing';
@@ -29,18 +29,12 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <ErrorBoundary>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <StoreInitializer>
-            <GlobalNav />
-            <main className="pt-16">{children}</main>
-            <Toaster />
-          </StoreInitializer>
-        </ThemeProvider>
+        <StoreInitializer>
+          <StarryBackground />
+          <Sidebar />
+          <main className="pl-64">{children}</main>
+          <Toaster />
+        </StoreInitializer>
       </ErrorBoundary>
     </NextIntlClientProvider>
   );

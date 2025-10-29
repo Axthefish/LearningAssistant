@@ -137,17 +137,10 @@ export default function DiagnosisPage() {
   })
   
   return (
-    <div className="min-h-screen flex bg-background">
-      {/* Sidebar Placeholder */}
-      <div className="hidden lg:block">
-        <div className="w-64 h-full fixed left-0 top-0">
-          <div className="h-full bg-card/50 backdrop-blur-xl border-r border-border/50" />
-        </div>
-      </div>
-      
-      <main className="flex-1 lg:ml-64">
-        <div className="p-6 md:p-12">
-          <div className="max-w-4xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background">
+      <StepNavigator />
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
         {/* Progress - 简化版 */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -286,9 +279,8 @@ export default function DiagnosisPage() {
             </motion.div>
           </AnimatePresence>
         )}
-          </div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

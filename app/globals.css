@@ -4,100 +4,50 @@
 
 @layer base {
   :root {
-    /* Light Mode - 现在作为备选主题 */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 13%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    /* 固定深色主题 - 星空背景配色 */
+    --background: 0 0% 7%; /* 深邃黑，与星空背景一致 */
+    --foreground: 0 0% 98%;
     
-    /* 主色调 - 蓝色 */
-    --primary: 217 91% 60%;
+    /* 半透明玻璃态卡片 */
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 98%;
+    
+    /* 主色调 - 明亮蓝色 */
+    --primary: 211 100% 55%;
     --primary-foreground: 0 0% 100%;
     
-    /* 灰度系统 */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
-    --muted: 0 0% 96.5%;
-    --muted-foreground: 0 0% 45%;
+    /* 深色灰度系统 */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
     
-    /* 新增颜色 */
-    --teal: 172 66% 50%;
-    --teal-foreground: 0 0% 100%;
-    --amber: 38 92% 50%;
-    --amber-foreground: 0 0% 13%;
-    
-    /* 金色accent（强调） */
-    --accent: 38 92% 50%;
+    /* 金色accent */
+    --accent: 38 92% 55%;
     --accent-foreground: 0 0% 100%;
     
     /* 语义色 */
-    --success: 142 76% 36%;
-    --warning: 28 100% 50%;
-    --destructive: 4 90% 58%;
-    --destructive-foreground: 0 0% 100%;
-    
-    --border: 0 0% 89%;
-    --input: 0 0% 96%;
-    --ring: 217 91% 60%;
-    
-    /* 更新圆角 */
-    --radius: 1rem; /* 16px */
-    --radius-lg: 1.5rem; /* 24px */
-    --radius-xl: 2rem; /* 32px */
-    
-    /* 阴影 */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .dark {
-    /* 新版深色主题 - 默认主题风格 */
-    --background: 222 47% 6%; /* #0A0F1E 深邃蓝黑 */
-    --foreground: 210 20% 98%;
-    
-    /* 卡片 - 稍亮一些的深色 */
-    --card: 222 39% 11%; /* #141A2D */
-    --card-foreground: 210 20% 98%;
-    --popover: 222 39% 11%;
-    --popover-foreground: 210 20% 98%;
-    
-    /* 主色调 - 蓝色 */
-    --primary: 217 91% 60%; /* #3B82F6 蓝色 */
-    --primary-foreground: 0 0% 100%;
-    
-    /* 深色灰度 */
-    --secondary: 222 39% 16%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 222 39% 16%;
-    --muted-foreground: 217 10% 64%;
-    
-    /* 新配色 */
-    --teal: 172 66% 50%; /* #2DD4BF 青色 */
-    --teal-foreground: 0 0% 100%;
-    --amber: 38 92% 55%; /* #FDB022 金色 */
-    --amber-foreground: 222 47% 6%;
-    
-    --accent: 172 66% 50%;
-    --accent-foreground: 0 0% 100%;
-    
-    /* Dark mode语义色 */
     --success: 142 76% 42%;
-    --warning: 38 92% 55%;
+    --warning: 28 100% 55%;
     --destructive: 4 90% 63%;
     --destructive-foreground: 0 0% 100%;
     
-    --border: 222 39% 20%;
-    --input: 222 39% 16%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 211 100% 55%;
     
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.5);
+    /* 圆角 */
+    --radius: 0.75rem; /* 12px */
+    --radius-lg: 1rem; /* 16px */
+    --radius-xl: 1.25rem; /* 20px */
+    
+    /* 阴影 */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 }
 

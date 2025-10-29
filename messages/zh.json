@@ -100,10 +100,37 @@
   },
   "sessionHistory": {
     "title": "历史会话",
+    "subtitle": "回顾你的成长历程",
     "empty": "暂无历史会话",
     "newSession": "新会话",
     "step": "步骤 {current}/{total}",
     "download": "导出Markdown"
+  },
+  "onboarding": {
+    "title": "专属你的成长计划",
+    "subtitle": "接下来的几个问题将帮助我们了解你的具体目标、学习方式和挑战，从而为你的成长打造真正有效的框架。",
+    "startPersonalization": "开始个性化",
+    "skipToUniversal": "不了，继续通用框架...",
+    "features": "你将获得：个性化目标分析 · 3D可视化框架 · 可执行的行动路径"
+  },
+  "dashboard": {
+    "welcome": "欢迎回来, {name}",
+    "subtitle": "准备好塑造你的未来了吗？",
+    "newGoal": {
+      "title": "开启新目标",
+      "description": "定义你的下一个雄心，创造一条清晰的前进道路。"
+    },
+    "resumeSession": {
+      "title": "继续会话",
+      "description": "继续定义你的目标"
+    },
+    "reviewPast": {
+      "title": "回顾历史会话",
+      "description": "回顾你的成长历程，获得新的启发。"
+    },
+    "step": "步骤 {current}/{total}",
+    "sessionsCount": "{count} 个已完成的会话",
+    "quote": "\"开始行动的秘诀就是开始。\" - Mark Twain",
+    "decorationText": "你的成长蓝图"
   }
 }
-

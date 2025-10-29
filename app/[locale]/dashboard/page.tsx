@@ -1,185 +1,230 @@
 'use client'
 
-/**
- * Dashboard Page
- * 主控制台 - Welcome back界面
- */
-
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { getPathWithLocale, type Locale } from '@/i18n/routing'
 import { useStore } from '@/lib/store'
-import { Sidebar } from '@/components/Sidebar'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Play, History, Settings2 } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 import { motion } from 'framer-motion'
+import { Target, Play, History, User } from 'lucide-react'
 
+/**
+ * Dashboard 用户中心页面
+ * 提供新建目标、继续会话、回顾历史三个入口
+ */
 export default function DashboardPage() {
+  const t = useTranslations('dashboard')
   const router = useRouter()
   const locale = useLocale() as Locale
-  const currentSession = useStore(state => state.session)
-  const goToStep = useStore(state => state.goToStep)
+  const session = useStore(state => state.session)
+  const loadAllSessions = useStore(state => state.loadAllSessions)
+  const sessions = useStore(state => state.sessions)
+  const createNewSession = useStore(state => state.createNewSession)
   
-  const handleStartNewGoal = async () => {
-    await goToStep(2)
-    router.push(getPathWithLocale('/ambition', locale))
+  const [userName, setUserName] = useState('User')
+  
+  useEffect(() => {
+    // 加载历史会话
+    loadAllSessions()
+    
+    // 从localStorage获取用户名（如果有）
+    if (typeof window !== 'undefined') {
+      const storedName = localStorage.getItem('learning-assistant:user-name')
+      if (storedName) setUserName(storedName)
+    }
+  }, [loadAllSessions])
+  
+  const handleNewGoal = async () => {
+    await createNewSession()
+    router.push(getPathWithLocale('/', locale))
   }
   
   const handleResumeSession = () => {
-    if (!currentSession) return
+    if (!session) return
     
     // 根据当前步骤跳转到对应页面
-    const stepRoutes: Record<number, string> = {
-      2: '/ambition',
+    const stepRoutes = {
+      1: '/',
+      2: '/initial',
       3: '/universal',
       4: '/universal',
       5: '/diagnosis',
       6: '/diagnosis',
       7: '/personalized'
-    }
+    } as const
     
-    const targetRoute = stepRoutes[currentSession.currentStep]
+    const targetRoute = stepRoutes[session.currentStep as keyof typeof stepRoutes]
     if (targetRoute) {
       router.push(getPathWithLocale(targetRoute, locale))
     }
   }
   
-  const handleReviewPastSessions = () => {
-    // TODO: 实现历史会话查看
-    alert('历史会话功能即将推出')
+  const handleReviewPast = () => {
+    router.push(getPathWithLocale('/history', locale))
   }
-
+  
+  // 检查是否有进行中的会话
+  const hasActiveSession = session && session.currentStep > 1 && session.currentStep < 8
+  
   return (
-    <div className="min-h-screen flex">
-      <Sidebar />
-      
-      <main className="flex-1 lg:ml-64">
-        <div className="p-6 md:p-12 max-w-7xl mx-auto">
-          {/* Welcome Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">
-              Welcome back, Alex
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Ready to shape your future?
-            </p>
-          </motion.div>
-
-          {/* Action Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {/* Start New Goal */}
+    <div className="min-h-screen p-8">
+      <div className="container mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left: Main Content */}
+          <div className="space-y-8">
+            {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-4"
             >
-              <Card 
-                className="p-8 cursor-pointer hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-amber/50 bg-gradient-to-br from-card to-card/50 relative overflow-hidden group"
-                onClick={handleStartNewGoal}
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-amber/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber/20 to-amber/10 flex items-center justify-center mb-6">
-                    <Sparkles className="w-7 h-7 text-amber" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3">Start a New Goal</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Define your next goal and create a clear path forward.
-                  </p>
-                  <div className="flex items-center gap-2 text-amber font-medium">
-                    <span>Begin</span>
-                    <Play className="w-4 h-4" />
-                  </div>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center">
+                  <User className="w-8 h-8 text-primary" />
                 </div>
-              </Card>
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold">
+                    {t('welcome', { name: userName })}
+                  </h1>
+                  <p className="text-muted-foreground text-lg">
+                    {t('subtitle')}
+                  </p>
+                </div>
+              </div>
             </motion.div>
-
-            {/* Resume Session */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Card 
-                className={`p-8 cursor-pointer hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-teal/10 to-card relative overflow-hidden group ${
-                  !currentSession ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                onClick={currentSession ? handleResumeSession : undefined}
+            
+            {/* Action Cards */}
+            <div className="space-y-4">
+              {/* Start a New Goal */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-teal/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-teal/20 flex items-center justify-center mb-6">
-                    <Play className="w-7 h-7 text-teal" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3">Resume Session</h3>
-                  {currentSession ? (
-                    <>
-                      <p className="text-muted-foreground mb-2">
-                        Continue defining &apos;Launch Side Project&apos;.
+                <Card 
+                  className="p-8 cursor-pointer hover:border-primary/50 transition-all duration-300 group bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-2 border-amber-500/20 hover:shadow-xl"
+                  onClick={handleNewGoal}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500/30 to-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Target className="w-7 h-7 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                        {t('newGoal.title')}
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {t('newGoal.description')}
                       </p>
-                      <div className="text-sm text-muted-foreground mb-6">
-                        Step {currentSession.currentStep}/7
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+              
+              {/* Resume Session */}
+              {hasActiveSession && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  <Card 
+                    className="p-8 cursor-pointer hover:border-primary/50 transition-all duration-300 group bg-gradient-to-br from-teal-500/10 to-cyan-500/5 border-2 border-teal-500/20 hover:shadow-xl"
+                    onClick={handleResumeSession}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500/30 to-cyan-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Play className="w-7 h-7 text-teal-600 dark:text-teal-400" />
                       </div>
-                    </>
-                  ) : (
-                    <p className="text-muted-foreground mb-6">
-                      No active session found.
-                    </p>
-                  )}
-                  <div className="flex items-center gap-2 text-teal font-medium">
-                    <span>Continue</span>
-                    <Play className="w-4 h-4" />
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-
-            {/* Review Past Sessions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <Card 
-                className="p-8 cursor-pointer hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/50 relative overflow-hidden group"
-                onClick={handleReviewPastSessions}
+                      <div className="flex-1">
+                        <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                          {t('resumeSession.title')}
+                        </h2>
+                        <p className="text-muted-foreground">
+                          {session.purposeStatement?.content 
+                            ? `"${session.purposeStatement.content.slice(0, 80)}${session.purposeStatement.content.length > 80 ? '...' : ''}"`
+                            : t('resumeSession.description')
+                          }
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {t('step', { current: session.currentStep, total: 7 })}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              )}
+              
+              {/* Review Past Sessions */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mb-6">
-                    <History className="w-7 h-7 text-primary" />
+                <Card 
+                  className="p-8 cursor-pointer hover:border-primary/50 transition-all duration-300 group bg-card/50 border-2 hover:shadow-xl"
+                  onClick={handleReviewPast}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <History className="w-7 h-7 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                        {t('reviewPast.title')}
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {t('reviewPast.description')}
+                      </p>
+                      {sessions.length > 0 && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {t('sessionsCount', { count: sessions.length })}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3">Review Past Sessions</h3>
-                  <p className="text-muted-foreground mb-6">
-                    Reflect on your journey and insights.
-                  </p>
-                  <div className="flex items-center gap-2 text-primary font-medium">
-                    <span>View History</span>
-                    <History className="w-4 h-4" />
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
+            </div>
+            
+            {/* Quote */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="text-center pt-8"
+            >
+              <p className="text-muted-foreground italic">
+                {t('quote')}
+              </p>
             </motion.div>
           </div>
-
-          {/* Quote */}
+          
+          {/* Right: 3D Decoration (Placeholder) */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-16 text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="hidden lg:flex items-center justify-center"
           >
-            <p className="text-muted-foreground italic">
-              &quot;The secret of getting ahead is getting started.&quot; - Mark Twain
-            </p>
+            <div className="w-full h-[600px] rounded-3xl bg-gradient-to-br from-primary/5 to-accent/5 border border-border/50 flex items-center justify-center relative overflow-hidden">
+              {/* 3D Placeholder */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-64 h-64 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 blur-3xl animate-pulse" />
+              </div>
+              <div className="relative z-10 text-center space-y-4">
+                <div className="w-32 h-32 mx-auto rounded-3xl bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center animate-float">
+                  <Target className="w-16 h-16 text-primary" />
+                </div>
+                <p className="text-muted-foreground">{t('decorationText')}</p>
+              </div>
+            </div>
           </motion.div>
         </div>
-      </main>
+      </div>
     </div>
   )
 }

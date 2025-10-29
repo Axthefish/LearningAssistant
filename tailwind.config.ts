@@ -52,29 +52,12 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        teal: {
-          DEFAULT: "hsl(var(--teal))",
-          foreground: "hsl(var(--teal-foreground))",
-        },
-        amber: {
-          DEFAULT: "hsl(var(--amber))",
-          foreground: "hsl(var(--amber-foreground))",
-        },
-        success: "hsl(var(--success))",
-        warning: "hsl(var(--warning))",
       },
       borderRadius: {
         lg: "var(--radius-lg)",
         md: "var(--radius)",
         sm: "calc(var(--radius) - 4px)",
         xl: "var(--radius-xl)",
-        '2xl': '1.5rem',
-        '3xl': '2rem',
-      },
-      backgroundImage: {
-        'gradient-teal-amber': 'linear-gradient(135deg, hsl(var(--teal)) 0%, hsl(var(--amber)) 100%)',
-        'gradient-green-gold': 'linear-gradient(135deg, #2DD4BF 0%, #FDB022 100%)',
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
       boxShadow: {
         'apple-sm': 'var(--shadow-sm)',
@@ -103,10 +86,15 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float 3s ease-in-out infinite",
       },
     },
   },

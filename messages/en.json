@@ -98,10 +98,38 @@
   },
   "sessionHistory": {
     "title": "Session History",
+    "subtitle": "Review your growth journey",
     "empty": "No sessions yet",
     "newSession": "New Session",
     "step": "Step {current}/{total}",
     "download": "Export Markdown"
+  },
+  "onboarding": {
+    "title": "A Plan Built Just For You",
+    "subtitle": "The next few questions will help us understand your specific goals, learning style, and challenges to create a truly effective framework for your growth.",
+    "startPersonalization": "Start Personalization",
+    "skipToUniversal": "No Thanks, Continue with Universal...",
+    "features": "You will get: Personalized goal analysis · 3D visualization · Actionable roadmap"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {name}",
+    "subtitle": "Ready to shape your future?",
+    "newGoal": {
+      "title": "Start a New Goal",
+      "description": "Define your next ambition and create a clear path forward."
+    },
+    "resumeSession": {
+      "title": "Resume Session",
+      "description": "Continue defining your goal"
+    },
+    "reviewPast": {
+      "title": "Review Past Sessions",
+      "description": "Reflect on your journey and insights."
+    },
+    "step": "Step {current}/{total}",
+    "sessionsCount": "{count} completed sessions",
+    "quote": "\"The secret of getting ahead is getting started.\" - Mark Twain",
+    "decorationText": "Your Growth Blueprint"
   },
   "domain": {},
   "topic": {}

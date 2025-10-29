@@ -23,6 +23,9 @@ interface AppState {
   // 当前会话
   session: Session | null
   
+  // 所有会话列表（用于历史记录）
+  sessions: Session[]
+  
   // 加载状态
   isLoading: boolean
   error: string | null
@@ -31,6 +34,9 @@ interface AppState {
   initializeSession: () => Promise<void>
   createNewSession: () => Promise<void>
   loadSession: (id: string) => Promise<void>
+  loadAllSessions: () => Promise<void>
+  deleteSession: (id: string) => Promise<void>
+  switchSession: (id: string) => Promise<void>
   
   // Actions - 步骤1: 用户输入
   setUserInput: (input: string) => Promise<void>
@@ -65,6 +71,7 @@ export const useStore = create<AppState>()(
   devtools(
     (set, get) => ({
       session: null,
+      sessions: [],
       isLoading: false,
       error: null,
       
@@ -318,6 +325,61 @@ export const useStore = create<AppState>()(
       // 重置会话
       resetSession: async () => {
         await get().createNewSession()
+      },
+      
+      // 加载所有会话（用于历史记录）
+      loadAllSessions: async () => {
+        try {
+          const sessions = await storage.listSessions()
+          // 按更新时间倒序排列
+          const sorted = sessions.sort((a, b) => b.updatedAt - a.updatedAt)
+          set({ sessions: sorted })
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to load sessions',
+          })
+        }
+      },
+      
+      // 删除指定会话
+      deleteSession: async (id: string) => {
+        try {
+          await storage.deleteSession(id)
+          // 更新sessions列表
+          const sessions = get().sessions.filter(s => s.id !== id)
+          set({ sessions })
+          
+          // 如果删除的是当前会话，创建新会话
+          if (get().session?.id === id) {
+            await get().createNewSession()
+          }
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to delete session',
+          })
+        }
+      },
+      
+      // 切换到指定会话
+      switchSession: async (id: string) => {
+        set({ isLoading: true, error: null })
+        
+        try {
+          const session = await storage.getSession(id)
+          
+          if (!session) {
+            throw new Error('Session not found')
+          }
+          
+          // 设为当前会话
+          await storage.saveSession(session)
+          set({ session, isLoading: false })
+        } catch (error) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to switch session',
+            isLoading: false,
+          })
+        }
       },
     }),
     { name: 'LearningAssistantStore' }
