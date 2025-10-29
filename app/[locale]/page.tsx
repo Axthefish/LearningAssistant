@@ -177,7 +177,7 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.6 }}
         >
-          <Card className="p-12 space-y-8 shadow-apple-lg border-0">
+          <Card className="p-12 space-y-8 shadow-apple-lg border-0 bg-card/40 backdrop-blur-xl">
             <div className="space-y-3">
               <Textarea
                 placeholder={t('inputPlaceholder')}

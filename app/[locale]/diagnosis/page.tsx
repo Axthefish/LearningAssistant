@@ -184,7 +184,7 @@ export default function DiagnosisPage() {
             </div>
             
             {content && (
-              <Card className="p-6">
+              <Card className="p-6 bg-card/40 backdrop-blur-xl">
                 <StreamingMessage
                   content={content}
                   isStreaming={isStreaming}
@@ -203,7 +203,7 @@ export default function DiagnosisPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <Card className="p-6 space-y-6">
+              <Card className="p-6 space-y-6 bg-card/40 backdrop-blur-xl">
                 {/* Focus Area */}
                 <div className="space-y-2">
                   <div className="inline-block px-3 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
@@ -251,7 +251,10 @@ export default function DiagnosisPage() {
                   
                   <div className="flex items-center justify-between w-full">
                     <Button
-                      onClick={() => previousStep()}
+                      onClick={async () => {
+                        await previousStep()
+                        router.push(getPathWithLocale('/universal', locale))
+                      }}
                       variant="outline"
                     >
                       <ArrowLeft className="w-4 h-4 mr-2" />

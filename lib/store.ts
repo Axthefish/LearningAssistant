@@ -308,13 +308,16 @@ export const useStore = create<AppState>()(
         await get().goToStep(nextStep)
       },
       
-      // 上一步
+      // 上一步（包含路由跳转）
       previousStep: async () => {
         const { session } = get()
         if (!session) return
         
         const prevStep = Math.max(session.currentStep - 1, 1)
         await get().goToStep(prevStep)
+        
+        // 触发路由跳转在UI组件中处理
+        return prevStep
       },
       
       // 清除错误

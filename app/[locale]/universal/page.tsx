@@ -106,7 +106,10 @@ export default function UniversalFrameworkPage() {
             </div>
             <div className="flex items-center gap-3">
               <Button
-                onClick={() => previousStep()}
+                onClick={async () => {
+                  await previousStep()
+                  router.push(getPathWithLocale('/initial', locale))
+                }}
                 variant="outline"
                 size="lg"
               >
@@ -197,7 +200,7 @@ export default function UniversalFrameworkPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <Card className="p-6 relative">
+                    <Card className="p-6 relative bg-card/40 backdrop-blur-xl">
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(content || markdownContent)

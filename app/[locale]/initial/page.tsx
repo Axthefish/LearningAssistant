@@ -135,7 +135,7 @@ export default function InitialExtractionPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="p-6 space-y-4">
+            <Card className="p-6 space-y-4 bg-card/40 backdrop-blur-xl">
               {isEditing ? (
                 <Textarea
                   value={editedContent}
@@ -152,7 +152,10 @@ export default function InitialExtractionPage() {
               {!isStreaming && (
                 <div className="flex items-center justify-between pt-4 border-t">
                   <Button
-                    onClick={() => previousStep()}
+                    onClick={async () => {
+                      await previousStep()
+                      router.push(getPathWithLocale('/', locale))
+                    }}
                     variant="outline"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />

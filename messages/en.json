@@ -19,9 +19,17 @@
   },
   "nav": {
     "home": "Home",
-    "history": "Previous Conversations",
-    "newSession": "Start New Exploration",
-    "theme": "Toggle Theme"
+    "history": "History",
+    "newSession": "New Session",
+    "theme": "Toggle Theme",
+    "collapse": "Collapse"
+  },
+  "sidebar": {
+    "home": "Home",
+    "history": "History",
+    "newSession": "New Session",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "homepage": {
     "title": "Facing a new challenge, not sure where to start?",

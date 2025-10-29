@@ -141,7 +141,10 @@ export default function PersonalizedFrameworkPage() {
             <div className="flex items-center space-x-2">
               {!isComplete && (
                 <Button
-                  onClick={() => previousStep()}
+                  onClick={async () => {
+                    await previousStep()
+                    router.push(getPathWithLocale('/diagnosis', locale))
+                  }}
                   variant="outline"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
@@ -203,7 +206,7 @@ export default function PersonalizedFrameworkPage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  <Card className="p-6">
+                  <Card className="p-6 bg-card/40 backdrop-blur-xl">
                     <StreamingMessage
                       content={content}
                       isStreaming={isStreaming}

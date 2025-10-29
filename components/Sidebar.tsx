@@ -6,7 +6,7 @@
  */
 
 import { useRouter as useNextRouter, usePathname as useNextPathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useStore, useCurrentStep } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,6 +33,8 @@ export function Sidebar() {
   const router = useNextRouter()
   const pathname = useNextPathname()
   const locale = useLocale() as Locale
+  const t = useTranslations('sidebar')
+  const tCommon = useTranslations('common')
   const currentStep = useCurrentStep()
   const resetSession = useStore(state => state.resetSession)
   
@@ -124,30 +126,30 @@ export function Sidebar() {
             variant="ghost"
             className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start gap-3'}`}
             onClick={handleGoHome}
-            title="首页"
+            title={t('home')}
           >
             <Home className="w-5 h-5" />
-            {!isCollapsed && <span>首页</span>}
+            {!isCollapsed && <span>{t('home')}</span>}
           </Button>
           
           <Button
             variant="ghost"
             className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start gap-3'}`}
             onClick={() => setShowHistory(true)}
-            title="历史记录"
+            title={t('history')}
           >
             <History className="w-5 h-5" />
-            {!isCollapsed && <span>历史记录</span>}
+            {!isCollapsed && <span>{t('history')}</span>}
           </Button>
           
           <Button
             variant="ghost"
             className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start gap-3'}`}
             onClick={handleNewSession}
-            title="新会话"
+            title={t('newSession')}
           >
             <Plus className="w-5 h-5" />
-            {!isCollapsed && <span>新会话</span>}
+            {!isCollapsed && <span>{t('newSession')}</span>}
           </Button>
         </nav>
         
@@ -181,14 +183,14 @@ export function Sidebar() {
             variant="ghost"
             className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start gap-3'}`}
             onClick={() => setIsCollapsed(!isCollapsed)}
-            title={isCollapsed ? '展开' : '折叠'}
+            title={isCollapsed ? t('expand') : t('collapse')}
           >
             {isCollapsed ? (
               <ChevronRight className="w-5 h-5" />
             ) : (
               <>
                 <ChevronLeft className="w-5 h-5" />
-                <span>折叠</span>
+                <span>{t('collapse')}</span>
               </>
             )}
           </Button>

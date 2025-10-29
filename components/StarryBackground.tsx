@@ -32,9 +32,11 @@ export function StarryBackground() {
       opacity: number
       twinkleSpeed: number
       twinklePhase: number
+      vx: number // 水平速度
+      vy: number // 垂直速度
     }
 
-    // 生成星星（更多、更动态）
+    // 生成星星（更多、更动态、会移动）
     const stars: Star[] = []
     const starCount = Math.floor((canvas.width * canvas.height) / 5000) // 增加星星数量
     
@@ -46,6 +48,8 @@ export function StarryBackground() {
         opacity: Math.random() * 0.6 + 0.2, // 0.2-0.8
         twinkleSpeed: Math.random() * 0.03 + 0.008, // 更快的闪烁
         twinklePhase: Math.random() * Math.PI * 2,
+        vx: (Math.random() - 0.5) * 0.1, // 缓慢的水平移动
+        vy: (Math.random() - 0.5) * 0.1, // 缓慢的垂直移动
       })
     }
 
@@ -58,8 +62,18 @@ export function StarryBackground() {
       ctx.fillStyle = 'rgb(7, 7, 18)' // 深邃的深蓝黑色
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // 绘制星星（更动态的效果）
+      // 绘制并移动星星
       stars.forEach((star) => {
+        // 更新星星位置（移动）
+        star.x += star.vx
+        star.y += star.vy
+        
+        // 边界检测并循环
+        if (star.x < 0) star.x = canvas.width
+        if (star.x > canvas.width) star.x = 0
+        if (star.y < 0) star.y = canvas.height
+        if (star.y > canvas.height) star.y = 0
+        
         // 计算闪烁效果
         const twinkle = Math.sin(frame * star.twinkleSpeed + star.twinklePhase)
         const currentOpacity = star.opacity + twinkle * 0.4

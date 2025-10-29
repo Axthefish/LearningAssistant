@@ -19,9 +19,17 @@
   },
   "nav": {
     "home": "首页",
-    "history": "之前的对话",
-    "newSession": "开始新的探索",
-    "theme": "切换主题"
+    "history": "历史记录",
+    "newSession": "新会话",
+    "theme": "切换主题",
+    "collapse": "折叠"
+  },
+  "sidebar": {
+    "home": "首页",
+    "history": "历史记录",
+    "newSession": "新会话",
+    "collapse": "折叠",
+    "expand": "展开"
   },
   "homepage": {
     "title": "面对新问题，不知从哪开始？",
