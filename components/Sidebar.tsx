@@ -83,10 +83,10 @@ export function Sidebar() {
         initial={false}
         animate={{ width: isCollapsed ? 80 : 256 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className="fixed left-0 top-0 bottom-0 bg-card/30 backdrop-blur-2xl border-r border-border/30 z-40 flex flex-col shadow-2xl"
+        className="fixed left-0 top-0 bottom-0 bg-card/20 backdrop-blur-xl border-r border-border/20 z-40 flex flex-col shadow-2xl"
       >
         {/* Logo/Brand */}
-        <div className="p-6 border-b border-border/30">
+        <div className="p-6 border-b border-border/20">
           <AnimatePresence mode="wait">
             {!isCollapsed ? (
               <motion.div
@@ -154,7 +154,7 @@ export function Sidebar() {
         </nav>
         
         {/* 底部：语言切换 + 折叠按钮 */}
-        <div className="p-4 border-t border-border/30 space-y-2">
+        <div className="p-4 border-t border-border/20 space-y-2">
           {!isCollapsed && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
