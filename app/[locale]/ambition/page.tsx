@@ -1,8 +1,8 @@
 'use client'
 
 /**
- * Ambition Input Page
- * 目标输入页 - "What's Your Ambition?"
+ * Goal Input Page
+ * 目标输入页 - "What's Your Goal?"
  */
 
 import { useState } from 'react'
@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { HelpCircle, Bell, User } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-export default function AmbitionPage() {
+export default function GoalInputPage() {
   const router = useRouter()
   const locale = useLocale() as Locale
   const setUserInput = useStore(state => state.setUserInput)
@@ -38,7 +38,7 @@ export default function AmbitionPage() {
       const missionPath = getPathWithLocale('/mission-review', locale)
       router.push(missionPath)
     } catch (error) {
-      console.error('Failed to submit ambition:', error)
+      console.error('Failed to submit goal:', error)
       setIsSubmitting(false)
     }
   }
@@ -54,7 +54,7 @@ export default function AmbitionPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-teal-amber flex items-center justify-center">
               <span className="text-white font-bold text-sm">A</span>
             </div>
-            <h1 className="text-lg font-bold">AmbitionAI</h1>
+            <h1 className="text-lg font-bold">Learning Assistant</h1>
           </div>
           
           <div className="flex items-center gap-2">
@@ -89,7 +89,7 @@ export default function AmbitionPage() {
               transition={{ delay: 0.2 }}
               className="text-4xl md:text-5xl font-bold"
             >
-              What&apos;s Your Ambition?
+              What&apos;s Your Goal?
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0 }}
@@ -97,7 +97,7 @@ export default function AmbitionPage() {
               transition={{ delay: 0.3 }}
               className="text-lg text-muted-foreground max-w-2xl mx-auto"
             >
-              Describe your aspiration in your own words. The more detail, the better our AI can help you.
+              Describe your goal in your own words. The more detail, the better our AI can help you.
             </motion.p>
           </div>
 

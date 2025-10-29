@@ -62,7 +62,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h1 className="text-4xl md:text-5xl font-bold mb-3">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">
               Welcome back, Alex
             </h1>
             <p className="text-xl text-muted-foreground">
@@ -89,7 +89,7 @@ export default function DashboardPage() {
                   </div>
                   <h3 className="text-2xl font-bold mb-3">Start a New Goal</h3>
                   <p className="text-muted-foreground mb-6">
-                    Define your next ambition and create a clear path forward.
+                    Define your next goal and create a clear path forward.
                   </p>
                   <div className="flex items-center gap-2 text-amber font-medium">
                     <span>Begin</span>
@@ -167,34 +167,12 @@ export default function DashboardPage() {
             </motion.div>
           </div>
 
-          {/* Decorative 3D Element Placeholder */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="relative h-96 rounded-3xl bg-gradient-to-br from-teal/10 via-card to-amber/10 overflow-hidden"
-          >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <div className="w-32 h-32 mx-auto rounded-3xl bg-gradient-teal-amber/20 flex items-center justify-center animate-pulse">
-                  <Sparkles className="w-16 h-16 text-teal" />
-                </div>
-                <p className="text-lg text-muted-foreground">
-                  Interactive 3D Visualization
-                </p>
-                <p className="text-sm text-muted-foreground max-w-md">
-                  Complete your first goal framework to unlock your personalized 3D energy pillar system.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
           {/* Quote */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-12 text-center"
+            transition={{ delay: 0.4 }}
+            className="mt-16 text-center"
           >
             <p className="text-muted-foreground italic">
               &quot;The secret of getting ahead is getting started.&quot; - Mark Twain
