@@ -126,19 +126,25 @@ export default function PersonalizedFrameworkPage() {
   
   
   return (
-    <div className="h-screen flex flex-col bg-background">
-      <StepNavigator />
-      {/* Header */}
-      <div className="border-b p-4">
-        <div className="container mx-auto">
+    <div className="h-screen flex bg-background">
+      {/* Sidebar */}
+      <div className="hidden lg:block">
+        <div className="w-64 h-full fixed left-0 top-0">
+          <div className="h-full bg-card/50 backdrop-blur-xl border-r border-border/50" />
+        </div>
+      </div>
+      
+      <main className="flex-1 lg:ml-64 h-screen overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-border/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">{t('title')}</h1>
-              <p className="text-sm text-muted-foreground">
+              <h1 className="text-3xl font-bold">{t('title')}</h1>
+              <p className="text-muted-foreground">
                 {t('subtitle')}
               </p>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               {!isComplete && (
                 <Button
                   onClick={() => previousStep()}
@@ -163,7 +169,6 @@ export default function PersonalizedFrameworkPage() {
             </div>
           </div>
         </div>
-      </div>
       
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
@@ -242,6 +247,7 @@ export default function PersonalizedFrameworkPage() {
           </div>
         </div>
       </div>
+      </main>
     </div>
   )
 }

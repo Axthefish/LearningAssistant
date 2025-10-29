@@ -90,17 +90,21 @@ export default function UniversalFrameworkPage() {
   }
   
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Step Navigator */}
-      <StepNavigator />
+    <div className="h-screen flex bg-background">
+      {/* Sidebar */}
+      <div className="hidden lg:block">
+        <div className="w-64 h-full fixed left-0 top-0">
+          <div className="h-full bg-card/50 backdrop-blur-xl border-r border-border/50" />
+        </div>
+      </div>
       
-      {/* Header */}
-      <div className="border-b p-4">
-        <div className="container mx-auto">
+      <main className="flex-1 lg:ml-64 h-screen flex flex-col">
+        {/* Header */}
+        <div className="border-b border-border/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-apple-h1">{t('title')}</h1>
-              <p className="text-apple-caption text-muted-foreground">
+              <h1 className="text-3xl font-bold">{t('title')}</h1>
+              <p className="text-muted-foreground">
                 {t('subtitle')}
               </p>
             </div>
@@ -135,14 +139,13 @@ export default function UniversalFrameworkPage() {
             </div>
           </div>
         </div>
-      </div>
       
-      {/* Main Content - 可调整大小的面板 
-          注意：当前针对桌面优化。移动端建议：
-          - 使用 @media 检测小屏切为 direction="vertical"
-          - 或提供"切换视图"按钮在 Markdown/3D 间切换
-          - PanelResizeHandle 在触屏设备上增大命中区 */}
-      <div className="flex-1 overflow-hidden">
+        {/* Main Content - 可调整大小的面板 
+            注意：当前针对桌面优化。移动端建议：
+            - 使用 @media 检测小屏切为 direction="vertical"
+            - 或提供"切换视图"按钮在 Markdown/3D 间切换
+            - PanelResizeHandle 在触屏设备上增大命中区 */}
+        <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal" className="h-full">
           {/* Left: Markdown Content */}
           <Panel defaultSize={50} minSize={30} maxSize={70}>
@@ -257,7 +260,8 @@ export default function UniversalFrameworkPage() {
             </div>
           </Panel>
         </PanelGroup>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
