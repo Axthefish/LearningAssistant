@@ -8,10 +8,10 @@
     --background: 0 0% 7%; /* 深邃黑，与星空背景一致 */
     --foreground: 0 0% 98%;
     
-    /* 半透明玻璃态卡片 */
-    --card: 0 0% 12%;
+    /* 透明玻璃态卡片 */
+    --card: 0 0% 15% / 0.6; /* 半透明 */
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 12%;
+    --popover: 0 0% 12% / 0.8;
     --popover-foreground: 0 0% 98%;
     
     /* 主色调 - 明亮蓝色 */
@@ -129,14 +129,14 @@
     transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
   }
   
-  /* Apple玻璃态 */
+  /* Apple玻璃态 - 针对星空背景优化 */
   .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
   }
   
-  .dark .glass {
+  .glass-strong {
     background: rgba(30, 30, 30, 0.7);
     border: 0.5px solid rgba(255, 255, 255, 0.1);
   }

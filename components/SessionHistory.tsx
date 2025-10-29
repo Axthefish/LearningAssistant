@@ -6,15 +6,18 @@
  */
 
 import { useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import type { Session } from '@/lib/types'
 import type { Locale } from '@/i18n/routing'
+import { getPathWithLocale } from '@/i18n/routing'
 import { useStore } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Clock, Trash2, Download } from 'lucide-react'
 
 export function SessionHistory() {
+  const router = useRouter()
   const locale = useLocale() as Locale
   const t = useTranslations('sessionHistory')
   const sessions = useStore(state => state.sessions)
@@ -28,7 +31,28 @@ export function SessionHistory() {
   }, [loadAllSessions, locale])
   
   const handleLoadSession = async (id: string) => {
+    // 切换到该session
     await switchSession(id)
+    
+    // 获取切换后的session
+    const loadedSession = sessions.find(s => s.id === id)
+    if (!loadedSession) return
+    
+    // 根据步骤跳转到对应页面
+    const stepRoutes = {
+      1: '/',
+      2: '/initial',
+      3: '/universal',
+      4: '/universal',
+      5: '/diagnosis',
+      6: '/diagnosis',
+      7: '/personalized'
+    } as const
+    
+    const targetRoute = stepRoutes[loadedSession.currentStep as keyof typeof stepRoutes]
+    if (targetRoute) {
+      router.push(getPathWithLocale(targetRoute, locale))
+    }
   }
   
   const handleDeleteSession = async (id: string) => {

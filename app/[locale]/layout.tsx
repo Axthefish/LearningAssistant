@@ -32,7 +32,7 @@ export default async function LocaleLayout({
         <StoreInitializer>
           <StarryBackground />
           <Sidebar />
-          <main className="pl-64">{children}</main>
+          <main className="transition-all duration-300 pl-64">{children}</main>
           <Toaster />
         </StoreInitializer>
       </ErrorBoundary>
